@@ -1,0 +1,44 @@
+2.0 Background information and terms
+
+Some background information and definitions are required to understand some
+of the parameters used by D3-3780.  The next two sections are background 
+information.
+
+2.1 The "Std" and "Tran" abbreviations as used in D3-3780
+
+In 3780 two different framing formats are used to transmit files.  The 
+standard format is fine for sending text files but cannot transmit certain 
+special characters (the data gets confused with the protocol's framing 
+characters).  The transparent format can send all possible characters.
+D3-3780 transmits and recognizes either format and allows different buffer 
+translations of each.  The abbreviations "Std" and "Tran" are used
+throughout D3-3780 to refer to standard and transparent framing formats,
+respectively.
+
+2.2 The names "Vary", "Fixed", "Binary" and "Hex" as used in D3-3780
+
+An actual 3780 workstation formats the data buffers somewhat differently in 
+transparent mode than in standard mode.  The standard mode sends variable
+length records separated by record separator characters with consecutive 
+spaces compressed.  This buffer format is referred to in D3-3780 as 
+"Vary" (short for variable).  
+
+The format most commonly used in transparent mode sends all 80 characters 
+in a record and does not send record separators or perform space compression.  
+This mode is referred to as "Fixed".  Both "Vary" and "Fixed" formats use 
+the EBCDIC character set (D3-3780 performs ASCII/EBCDIC translations when 
+sending or receiving).
+
+Another commonly used format is one in which ASCII data is sent and received 
+from the PC without being converted.  This will be referred to as "Binary".  
+"Binary" data should normally be sent transparently since there is no 
+guarantee that invalid characters will be in the file.  The transparent 
+"Binary" mode can be used to send executable files from one PC to another. 
+Many emulators use this format including UDS' "Bsc" and AST Research's 3780.
+Some IBM mainframes are also set up to receive in this mode including the
+IRS'.
+
+D3-3780 has a buffer format called "Hex".  This mode transforms ASCII pairs
+into bytes and vice versa.  It is primarily useful as a diagnostic tool.
+This is not a true trace in that the 3780 framing and control characters are
+not written out.  A true trace will be added soon.

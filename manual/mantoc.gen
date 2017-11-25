@@ -1,0 +1,85 @@
+@Z_TOC TITLE = Table of Contents
+
+@Z_TOC LVL 1 = General Information	1-1
+
+@Z_TOC LVL 1 = Background information and terms	2-3
+
+@Z_TOC LVL 2 = The <BI>Std<D> and <BI>Tran<D> abbreviations as used 
+in D3-3780	3
+
+@Z_TOC LVL 2 = The names <BI>Vary<D>, <BI>Fixed<D>, <BI>Binary<D> 
+and <BI>Hex<D> as used in D3-3780	3
+
+@Z_TOC LVL 1 = The Default Command Screen	3-5
+
+@Z_TOC LVL 1 = Interactive Command Line Interface	4-9
+
+@Z_TOC LVL 2 = Interactive Editing Keys	9
+
+@Z_TOC LVL 2 = Delimiters	10
+
+@Z_TOC LVL 1 = Script Mode	5-11
+
+@Z_TOC LVL 2 = Built in Variables	11
+
+@Z_TOC LVL 2 = Constants	22
+
+@Z_TOC LVL 2 = Special Symbols	23
+
+@Z_TOC LVL 2 = Labels	26
+
+@Z_TOC LVL 2 = <MI>Scalar<D> and <MI>Pointer<D> as used in this document.	26
+
+@Z_TOC LVL 2 = Pointer Variable Fundamentals	26
+
+@Z_TOC LVL 2 = Common Pointer Errors	27
+
+@Z_TOC LVL 2 = Suppressing Video Output using '@' and '!'	29
+
+@Z_TOC LVL 2 = Booting D3-3780 in script mode	30
+
+@Z_TOC LVL 1 = Command Summary by Class	6-31
+
+@Z_TOC LVL 2 = Branching Control Commands	33
+
+@Z_TOC LVL 2 = File Commands	35
+
+@Z_TOC LVL 2 = DOS Call commands	35
+
+@Z_TOC LVL 2 = Data Copying Commands (determination of buffer length)	36
+
+@Z_TOC LVL 2 = Memory Allocation Commands	37
+
+@Z_TOC LVL 2 = Other pointer assignment commands	37
+
+@Z_TOC LVL 2 = Screen Control Commands	38
+
+@Z_TOC LVL 2 = Format options for writing strings out	39
+
+@Z_TOC LVL 1 = Alphabetical Command Summary	7-43
+
+@Z_TOC LVL 1 = Screen Customization Fundamentals	8-95
+
+@Z_TOC LVL 2 = Video Attributes	95
+
+@Z_TOC LVL 2 = Video Modes	96
+
+@Z_TOC LVL 2 = Attribute variables	97
+
+@Z_TOC LVL 2 = Video Escape Sequences	98
+
+@Z_TOC LVL 2 = Status Variables	106
+
+@Z_TOC LVL 2 = The Status Variable Format String	109
+
+@Z_TOC LVL 2 = The Status Mask value	112
+
+@Z_TOC LVL 2 = The Status Variable Maximum Length value	113
+
+@Z_TOC LVL 2 = The C format specification	113
+
+@Z_TOC LVL 1 = The D3-3780.CFG file and its options	9-117
+
+@Z_TOC LVL 2 = Changing the Package and Configuration filenames.	117
+
+

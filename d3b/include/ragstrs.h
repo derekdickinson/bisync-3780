@@ -1,0 +1,203 @@
+char *errmessages[]=
+{
+/*   0 */ "",
+/*   1 */ "The remote computer dropped the line",
+/*   2 */ "Unable to open file [%s]",
+/*   3 */ "Unable to open file \"%s\" in \"%s\" mode",
+/*   4 */ "Received busy signal",
+/*   5 */ "Unable to delete file [%s]",
+/*   6 */ "This command cannot be performed unless online",
+/*   7 */ "This command cannot be performed while online",
+/*   8 */ "No process in progress to kill",
+/*   9 */ "This command cannot be performed until current send is done",
+/*  10 */ "Disk error, See if disk is full",
+/*  11 */ "The modem was unable to train",
+/*  12 */ "Idle timeout during receive",
+/*  13 */ "Loopcount expired",
+/*  14 */ "No activity timeout exceeded",
+/*  15 */ "The modem is not able to transmit, It will not raise CTS",
+/*  16 */ "No files found (using [%s])",
+/*  17 */ "File [%s] not found",
+/*  18 */ "The modem is not able to transmit, SCC TX buffer error",
+/*  19 */ "No tone detected",
+/*  20 */ "The file specified by handle [%d] is not open",
+/*  21 */ "At end of file [%d], can't read anymore",
+/*  22 */ "No acknowledgment limit exceeded.  Receive aborted",
+/*  23 */ "Remote aborted receive",
+/*  24 */ "Bad acknowledgment limit exceeded.  Send aborted",
+/*  25 */ "Incomplete file sent - Enquiry limit was exceeded",
+/*  26 */ "No acknowledgment limit exceeded.  Send aborted",
+/*  27 */ "Remote computer aborted send",
+/*  28 */ "File is too large for an integer to store its length",
+/*  29 */ "Timeout expired",
+
+/*  50 */ "Argument List too big",
+/*  51 */ "\"%s\" already exists or invalid path",
+/*  52 */ "\"&\" not allowed on data type in \"%s\"",
+/*  53 */ "Brackets not allowed in \"%s\"",
+/*  54 */ "\"^\" on non-string\"%s\"",
+/*  55 */ "Did not understand syntax (Press \"?<Enter>\" for help)",
+/*  56 */ "Bad final character in \"%s\"",
+/*  57 */ "Bad index in \"%s\", index must be a scalar",
+/*  58 */ "Label [%s] not found",
+/*  69 */ "Line number %d,[%s] exceeds script file length",
+/*  60 */ "Wildcards on left must be in same positions as those on right",
+/*  61 */ "Error in phone number",
+/*  62 */ "Operator '%c' not recognized",
+/*  63 */ "Operator '%c' not valid with pointers or not recognized",
+/*  64 */ "Unexpected state [%d]",
+/*  65 */ "Unknown Variable or Symbol and parameter not allowed together in \"%s\"",
+/*  66 */ "Unknown Variable [%s]",
+/*  67 */ "This command is only allowed in script mode",
+/*  68 */ "Script file read error",
+/*  69 */ "Length pointer [%s] must point into the memory buffer",
+/*  70 */ "The value [%d] of parameter %d is too big, maximum allowed is %d",
+/*  71 */ "The value [%d] of parameter %d is too small, minimum allowed is %d",
+/*  72 */ "Filename (and path) is too big in [%s]",
+/*  73 */ "Number in \"%s\" must be between 0-9",
+/*  74 */ "At least %d parameter(s) required for this command",
+/*  75 */ "Error interfacing modem [%d]",
+/*  76 */ "The parameter [%s] cannot be assigned to",
+/*  77 */ "Buffer pointer [%s] must have memory allocated to it",
+/*  78 */ "The destination parameter [%s] cannot be a filename",
+/*  79 */ "The destination parameter [%s] must be label or line number",
+/*  80 */ "Parameter [%s] must be a filename",
+/*  81 */ "The value in parameter %d,[%s] cannot be assigned an integer",
+/*  82 */ "Length Parameter [%s] cannot be a file or label",
+/*  83 */ "Parameter [%s] should be a pointer or scalar variable",
+/*  84 */ "Parameter [%s] should be a pointer variable",
+/*  85 */ "Parameter [%s] should be a string constant or pointer",
+/*  86 */ "This command requires %d parameter(s)",
+/*  87 */ "Parameter [%s] should be a scalar",
+/*  88 */ "The parameter [%s] cannot be assigned a scalar",
+/*  89 */ "Parameter [%s] should be a filename or file specification",
+/*  90 */ "Parameter [%s] should be a pointer or scalar",
+/*  91 */ "The time designation should contain a colon",
+/*  92 */ "Unable to open help file \"%s\"",
+/*  93 */ "Insufficient internal memory to process command",
+/*  94 */ "Label not allowed in parameter [%s]",
+/*  95 */ "Pointer and scalar operands cannot both be present in this command",
+/*  96 */ "No values in stack to be popped.",
+/*  97 */ "Could not return to file \"%s\".",
+/*  98 */ "The filename cannot include wildcards",
+/*  99 */ "Attempt to move a file to another device",
+/* 100 */ "Optional parameter must be '%c' or nonexistant",
+/* 101 */ "The option [%c] is not valid",
+/* 102 */ "Incorrect variable type for this command in [%s]",
+/* 103 */ "Return without a call",
+/* 104 */ "Parameter [%s] must be a string of filename",
+/* 105 */ "The parameter [%s] should be a string or file specification",
+/* 106 */ "Modem data file \"MODEMS.DTA\" must be present for this command",
+/* 107 */ "The modem is did not responding",
+/* 108 */ "The entry [%s] was not found in phonelist",
+/* 109 */ "No modem detected",
+/* 110 */ "The modem's interrupt is not functioning properly",
+/* 111 */ "User Abort"
+};
+
+char *fileops[]=
+{         /*       B+?? */
+ "r",     /* 0x0 - 0000 */
+ "w",     /* 0x1 - 0001 */
+ "a",     /* 0x2 - 0010 */
+ "",      /* 0x3 - 0011 */
+ "r+",    /* 0x4 - 0100 */
+ "w+",    /* 0x5 - 0101 */
+ "a+",    /* 0x6 - 0110 */
+ "",      /* 0x7 - 0111 */
+ "rb",    /* 0x8 - 1000 */
+ "wb",    /* 0x9 - 1001 */
+ "ab",    /* 0xa - 1010 */
+ "",      /* 0xb - 1011 */
+ "rb+",   /* 0xc - 1100 */
+ "wb+",   /* 0xd - 1101 */
+ "ab+"    /* 0xe - 1110 */
+};
+
+char *fopsnams[]=
+{         /*       B+?? */
+ "R",     /* 0x0 - 0000 */
+ "W",     /* 0x1 - 0001 */
+ "A",     /* 0x2 - 0010 */
+ "",      /* 0x3 - 0011 */
+ "RP",    /* 0x4 - 0100 */
+ "WP",    /* 0x5 - 0101 */
+ "AP",    /* 0x6 - 0110 */
+ "",      /* 0x7 - 0111 */
+ "RB",    /* 0x8 - 1000 */
+ "WB",    /* 0x9 - 1001 */
+ "AB",    /* 0xa - 1010 */
+ "",      /* 0xb - 1011 */
+ "RBP",   /* 0xc - 1100 */
+ "WBP",   /* 0xd - 1101 */
+ "ABP"    /* 0xe - 1110 */
+};
+
+char *noyes[]=
+{ 
+  "No ",
+  "Yes" 
+};
+
+char *prinpunch[]=
+{ 
+  "Printer", 
+  "Punch  " 
+};
+
+char *rcvcnv[]=
+{
+  "Vary  ",
+  "Fixed ",
+  "Binary",
+  "Hex   "
+};
+
+char *sndmodename[]=
+{
+  "Std. Vary   ",
+  "Std. Fixed  ",
+  "Std. Binary ",
+  "Std. Hex    ",
+  "Tran. Vary  ",
+  "Tran. Fixed ",
+  "Tran. Binary",
+  "Tran. Hex   "
+};
+
+char *srs[]=
+{ 
+  "", 
+  "S", 
+  "R" 
+};
+
+char *statmess[]=
+{ 
+  "    Offline     ", 
+  "Waiting for Call", 
+  "   Connecting   ", 
+  "    Dialing     ",
+  " Got Dial Tone  ",
+  "    Ringing     ",
+  "Modem Handshake ",
+  "     Online     ", 
+  "    Sending     ", 
+  "   Receiving    " 
+};
+
+char *sts[]=
+{ 
+  "", 
+  "s", 
+  "t" 
+};
+
+char *escstr[]=
+{
+	"",
+	"\xD\xA",
+	"\xD\xA\xD\xA",
+	"\xC",
+	"\xC",
+};

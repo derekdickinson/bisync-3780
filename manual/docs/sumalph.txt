@@ -1,0 +1,94 @@
+?[,D3-3780 command or page number]
+>[DOS command]
+/[DOS command]
+*[Any thing you want out here up to 200 characters]
+aa[,+timeout] or [,hh:mm]
+app ptr,file[,val]
+astat     
+bdn buf[,val][;op]     
+bdp buf[,val][;op]     
+buf buf[,val][;op]     
+c
+call
+cat destptr,sourceptr
+clall
+close handle
+cls
+cpy destptr,sourceptr[,val]
+da
+dec val
+del spec
+dir spec
+dl string or file
+dn,file[,ops]
+dp,file[,ops]
+ds
+dt
+enz
+end
+er spec
+ex[,errorlevel]
+fq
+frite han,val[;ops][+val[;ops]]...
+fstat handle
+gbuf handle,buf[,val]
+go dest
+if errdest,noterrdest
+ife spec,existdest,notexistdest
+ifef handle,eofdest,noteofdest
+ifi lval=rval,equdest,diffdest
+ifp errdest,prindest,punchdest
+ifs lstr=rstr,equadest,diffdest
+ifs rfile=lfile,equadest,lfilegreaterdest,rfilegreaterdest
+ifo onlinedest,offlinedest
+if loopcount
+inc val
+intrp str
+key num[;op],val[;ops][+val[;ops]]...
+kl
+ld spec
+lf file
+load ptr,file[,val]
+lwr val
+m
+mo
+mo str[;op]
+mov destval,sourceval
+mv 
+on num,lownum[;highnum][=dest],lownum[;highnum][=dest],...
+open handle,file[;ops]
+opr destval,sourcenum,opchar
+aa[,+timeout] or [,hh:mm]
+pbuf handle,buf[,val]
+q[,errorlevel]
+qnz
+rdln handle,ptr[,val]
+read han,val[;ops][+val[;ops]]...
+rem commandstr[+commandstr]...
+ren oldspec newspec
+ret
+rite val[;ops][+val[;ops]]...
+s dat[;ops][+dat[;ops]]... ops
+save ptr,file[,val]
+seek handle,wherenum[,refnum]
+setbf buf[,val,[,num]]
+size numlow[;numhigh],file
+slen num,str
+so file|ptr
+sptr num,ptrbigger,ptrsmaller
+srite str,val[;ops][+val[;ops]]...
+ss
+st
+stc deststr,sourcestr,char
+stst deststr,sourcestr,substr
+sup
+svals
+td
+tell handle,varnum
+tk
+tr
+unsup
+upr val
+vals
+w,timeout
+xb file

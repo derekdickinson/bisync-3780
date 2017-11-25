@@ -1,0 +1,1498 @@
+@CHAPTER HEAD = Screen Customization Fundamentals
+
+<$M[Scrcust]>The following sections are for those who want to perform 
+extensive modification to the appearance of the <$R[V*,Packname]D3-3780> 
+package. There are a variety of commands and variables which allow 
+this.
+
+In the <$R[V*,Packname]D3-3780> package there are two fundamentally 
+different kinds of screen writes: Serial and Direct. The Serial writes 
+take place in a window which scrolls upward as more information is 
+written. This window contains the flashing cursor and video writes 
+always begin at the cursor. The cursor will remain at the line following 
+a serial write. Direct writes can be written anywhere on the screen 
+without regard to the cursor and do not (normally) affect the cursor. 
+The words <MI>serial<D> and <MI>direct<D> will be used frequently 
+in the following descriptions.
+
+@SECTION HEAD = Video Attributes
+
+<$M[Vidatts]>There is an attribute byte for each character on the 
+video screen. This byte determines the color and other attributes 
+of how the character is displayed. Attribute bytes are bit-mapped 
+in that different bits of the attribute have specific meanings. The 
+nominal bit definitions of the attribute bytes are:
+
+@LIST = Bit 7 (Most significant bit) Flashing (0 - normal, 1 - character 
+flashes)
+
+@LIST = 
+
+@LIST = Background Color is bits 4-6
+
+@LIST = Bit 6 Background Red
+
+@LIST = Bit 5 Background Green
+
+@LIST = Bit 4 Background Blue
+
+@LIST = 
+
+@LIST = Bit 3 Intensity (0 - Low intensity, 1 - High intensity)
+
+@LIST = 
+
+@LIST = Foreground Color is bits 0-2
+
+@LIST = Bit 2 Foreground Red
+
+@LIST = Bit 1 Foreground Green
+
+@LIST = Bit 0 Foreground Blue
+
+In color modes bits 4-6 bits combine to generate 8 distinct background 
+colors. Bits 0-3 are used to generate 16 unique foreground colors. 
+The first eight foreground colors look the same as the 8 background 
+colors (the characters aren't visible if the background and foreground 
+colors match). The last 8 foreground colors are merely brighter versions 
+of the first eight colors. These colors are:
+
+@LIST = 0 - Black
+
+@LIST = 1 - Blue
+
+@LIST = 2 - Green
+
+@LIST = 3 - Cyan
+
+@LIST = 4 - Red
+
+@LIST = 5 - Violet
+
+@LIST = 6 - Brown (or Yellow if in foreground with intensity set)
+
+@LIST = 7 - White
+
+Note: Various video cards can use slightly different mappings than 
+the 3-gun standard described above.
+
+If a monochrome monitor is being used then the following meanings 
+apply:
+
+@LIST = Flashing bit (7) determines flashing (same as on color)
+
+@LIST = Background, 7 (111b) is lit with low intensity all others 
+are black
+
+@LIST = Intensity bit (3) determines intensity (same as on color)
+
+@LIST = Foreground, 0 (000b) is black, 1 (001b) is underlined, all 
+others are <169>normal<170> or intense depending upon the intensity 
+bit
+
+Sometimes a user is running a monochrome monitor on a color display 
+card (this is especially common in portables). This is functionally 
+similar to monochrome except that the underline cannot be supported.
+
+@SECTION HEAD = Video Modes
+
+<$M[Vidmodes]>The Basic Input/Output System BIOS of a PC (really, 
+the video adapter) has a variety of video modes. Currently, <$R[V*,Packname]D3-3780> 
+supports three video modes directly (other modes can easily be added 
+if desired, these modes however are the most common).
+
+@LIST = Mode 2: Color adapter in monochrome mode.
+
+@LIST = Mode 3: Color adapter in color mode.
+
+@LIST = Mode 7: Monochrome adapter (only has one mode).
+
+All three of these modes have 25 rows and 80 columns. The default 
+video attributes are set according to which mode the adapter is found 
+in. If the package is booted while the system is in a mode other than 
+these 3 then it is switched by <$R[V*,Packname]D3-3780> into mode 
+3. This always works since: (1) all color cards support mode 3 and 
+(2) monochrome monitors are always in mode 7.
+
+When a user is running a monochrome monitor on a color adapter, mode 
+2 may look better than mode 3. This depends on how well the monochrome 
+monitor can convert color into intensity. If a user complains of an 
+illegible screen then it may be desirable to use DOS' mode command 
+to switch to mode 2.
+
+Mode Commands:
+
+@EXAMPLES = <P10M>A>>mode bw80  Sets mode to 2<P255D>
+
+@EXAMPLES = <P10M>A>>mode co80  Sets mode to 3<P255D>
+
+@EXAMPLES = <P10M>A>>mode mono  Sets mode to 7 (used in two monitor 
+system only)<P255D>
+
+The VM variable can be accessed in the command language to determine 
+the video mode.
+
+@SECTION HEAD = Attribute variables
+
+<$M[Attvars]>Variables which can be changed in the command language 
+are used heavily to determine the colors used in video writes. Certain 
+characteristics tend to be tied to certain attribute variables. Changing 
+one of these variables can a dramatic effect on the appearance of 
+the package (especially on color monitors). For example, changing 
+the value of the Graph Attribute will change the color of all the 
+graphic character (often used for borders) on t he screen.
+
+The names of these variables are:
+
+@LIST = CA	Change Attribute
+
+@LIST = DA	Default Attribute
+
+@LIST = GA	Graph Attribute
+
+@LIST = HA	High Attribute
+
+@LIST = KA	Key Attribute
+
+@LIST = RA	Reverse Attribute
+
+@LIST = UA	Underline Attribute
+
+@LIST = WA	Window Attribute
+
+@OUTDENT ITEM = The Change attribute is generally used to the distinguish 
+the changing parts of the screen from the parts which do not change. 
+The distinction is only made on color monitors. The default is Bright 
+White on color monitors and normal (low intensity) on monochrome monitors. 
+I've generally used this attribute for displaying the values of options 
+and status information in the direct writes. The implied meaning could 
+easily be changed.
+
+@OUTDENT ITEM = The Default attribute is used in a direct write until 
+the color is explicitly set using an escape sequence (see the next 
+section). It defaults to bright yellow on color monitors and normal 
+on monochrome monitors.
+
+@OUTDENT ITEM = The Graph attribute is automatically used for any 
+character which is above 127 decimal (hex 7F). This is used to make 
+the borders of boxes a different color than the text. The 16 decimal 
+(hex 10) escape sequence can be used to toggle the automatic use of 
+this attribute.
+
+@OUTDENT ITEM = The High attribute is used to highlight the filenames 
+and buffer types of the printer or punch when files are received. 
+When files are sent the attribute is used for the send filename. It 
+appears as Light Cyan on a color screen and High Intensity on monochrome.
+
+@OUTDENT ITEM = The Key attribute is the default attribute in interactive 
+mode for the keys that are being pressed (at the command <169>?<170> 
+prompt). Its default values are the same as the default attribute.
+
+@OUTDENT ITEM = The Reverse attribute defaults to black letters on 
+lighted background on a monochrome screen, black on green on a color 
+screen. It is not used for any particular class of operation.
+
+@OUTDENT ITEM = The Underline attribute defaults to underline on a 
+monochrome screen and red on a color screen. It is not used for any 
+particular class of operation.
+
+@OUTDENT ITEM = The Window attribute is the default attribute for 
+all writes in the scrolling window of the screen except a command 
+being edited in interactive mode. Its default value is normal (low 
+intensity, gray on color monitors).
+
+The next section has a description of a large number of video escape 
+sequences. Several of the escape sequences deal with the setting of 
+the attributes for video writes and use these variables to determine 
+the new attribute value.
+
+See Section <$R[S*,Bvars]5.1> for information on built in variables.
+
+@SECTION HEAD = Video Escape Sequences
+
+<$M[Videscs]>Video escape sequences can be used in either the direct 
+or serial writes. The row,column values for the serial writes however 
+are with respect to the current window while the row,column values 
+for the direct writes are with respect to the entire screen. Which 
+functions use direct and which are serial will be discussed later.
+
+The video writes have a number of special escape sequences which allow 
+you to change the colors and where the following characters will be 
+written.
+
+The terms <MI>row<D> and <MI>column<D> are used throughout the descriptions. 
+Row 1 is the highest row and column 1 is the leftmost column. In direct 
+writes, the rows are always numbered from 1 to 25 and the columns 
+from 1 to 80. In serial writes, rows are defined relative to window 
+variables (wt,wl,wr and wb for top, left, right and bottom). The allowed 
+range for serial rites is 26 minus wt for rows and 81 minus wl for 
+columns. 
+
+The term <MI>location<D> refers to the row and column at which the 
+next character will be written. This can be thought of as the cursor 
+location (although the actual flashing cursor is not necessarily moved 
+with these video writes).
+
+Video Escape Sequences (brief descriptions, long ones will follow):
+
+@Z_TBL_BEG = COLUMNS(4), DIMENSION(IN), COLWIDTHS(E1,E1,E3,E10), HGUTTER(.0560), 
+VGUTTER(.0560), BOX(Z_DOUBLE), HGRID(Z_SINGLE), VGRID(Z_SINGLE), KEEP(OFF), 
+L2(R1C0..R1C4)
+
+@Z_TBL_HEAD = TABLE TEXT, TABLE TEXT, TABLE TEXT, TABLE TEXT
+
+Dec<$!B11>, Hex<$!B11>, Arguments<$!B11>, Description<$!B11>
+
+@Z_TBL_BODY = TABLE TEXT, TABLE TEXT, TABLE TEXT, TABLE TEXT
+
+1, 01, Row  Column, Relative goto. Write continues at:<R>
+(row+old row,column+old column)
+
+2, 02, Row  Column, Absolute goto. Write contnues at: (row,column)
+
+3, 03, None, Put flashing cursor at current location when done
+
+4, 04, None, Switch to minimum escape set (7,8,9,10,13)
+
+5, 05, None, Take next byte literally
+
+6, 06, None, Take rest of string literally (disable escapes)
+
+7, 07, None, Audible Bell
+
+8, 08, None, Backspace
+
+9, 09, None, Tab (Default stops are every 10 spaces)
+
+10, 0A, None, Linefeed
+
+11, 0B, <169>##<170>, Scroll window <169>##<170> lines (backward if 
+negative)
+
+12, 0C, None, Clear video window (full screen for direct writes)
+
+13, 0D, None, Carriage return
+
+14, 0E, None, Toggle flash bit of attribute
+
+15, 0F, None, Toggle intensity bit of attribute
+
+16, 10, None, Toggle automatic use of graph attribute
+
+17, 11, <169>##<170>, Change attribute byte to <169>##<170>
+
+18, 12, None, Return to default attribute (either DA or WA)
+
+19, 13, None, Use Change Attribute(CA,, def: white,, normal)
+
+20, 14, None,  Use High Attribute(HA,, def:light cyan,, high intensity)
+
+21, 15, None, Use Graph Attribute(GA,, def:green,normal)
+
+22, 16, None, Use Reverse Attribute(RA,def:Black/Green,Reverse
+
+23, 17, None, Underline Attribute(UA,def:Red,Underline)
+
+24, 18, None, Up Arrow
+
+25, 19, None, Down Arrow
+
+26, 1A, None, Right Arrow
+
+27, 1B, None, Left Arrow
+
+28, 1C, <169>##<170>, Repeat the row above <169>##<170> times,, must 
+be in column 1
+
+29, 1D, <169>##<170>, Write <169>##<170> blanks,, do not advance location
+
+30, 1E, <169>##<170> ch, Make Column <169>##<170> rows tall with ch 
+character
+
+31, 1F, <169>##<170> ch, Write ch character,, <169>##<170> times
+
+@Z_TBL_END = 
+
+There are shorthand aliases for some of the escape sequences. These 
+are:
+
+@Z_TBL_BEG = COLUMNS(4), DIMENSION(IN), COLWIDTHS(E1,E1,E1,E5), HGUTTER(.0560), 
+VGUTTER(.0560), BOX(Z_DOUBLE), HGRID(Z_SINGLE), VGRID(Z_SINGLE), KEEP(ON), 
+L2(R1C0..R1C4)
+
+@Z_TBL_BODY = TABLE TEXT, TABLE TEXT, TABLE TEXT, TABLE TEXT
+
+Alias<$!B11>, Dec.<$!B11>, Hex<$!B11>, Description<$!B11>
+
+\a, \7, \x7, Bell
+
+\b, \8, \x8, Backspace
+
+\t, \9, \x9, Tab
+
+\n, \10, \xA, Linefeed
+
+\v, \11, \xB, Vertical Tab (scrolls the screen,, see above)
+
+\f, \12, \xC, Form Feed (clears the video window)
+
+\r, \13, \xD, Carriage return
+
+@Z_TBL_END = 
+
+The sequences are functionally identical to the numerical sequences. 
+They are also the same sequences used in the C programming language.
+
+Now for extensive descriptions of each of the escape sequences.
+
+@SYMBOL NAME = Escape Character:
+
+@SYMBOL ITEM = 1
+
+@SYMB DES NAME = Purpose:
+
+@SYMB DES ITEM = Set location for subsequent writes (relative)
+
+@SYMB DES NAME = Usage:
+
+@SYMB DES ITEM = <169>\1\<MI>row<D>\<MI>column<D><170>
+
+@SYMB DES NAME = Additional Character 1:
+
+@SYMB DES ITEM = Number of rows to add to current location
+
+@SYMB DES NAME = Additional Character 2:
+
+@SYMB DES ITEM = Number of columns to add to current location
+
+This sequence causes subsequent characters to be written starting 
+at the location specified by (<MI>row<D>+current row,<MI>column<D>+current 
+column). Where the next two characters in the string are <MI>row<D> 
+and <MI>column<D>. The <MI>row<D> and <MI>column<D> numbers can be 
+negative if the following write needs to be in a lower numbered column 
+or row. If the addition results in an out of range value then the 
+row/column will not change. When leaving the row/column unchanged, 
+a value that is always out of range (such as 100) should be used in 
+place of a zero (null byte) since the null byte will terminate the 
+string.
+
+@SYMBOL NAME = Escape Character:
+
+@SYMBOL ITEM = 2 
+
+@SYMB DES NAME = Purpose:
+
+@SYMB DES ITEM = Set location for subsequent writes (absolute)
+
+@SYMB DES NAME = Usage:
+
+@SYMB DES ITEM = <169>\2\<MI>row<D>\<MI>col<D><170>
+
+@SYMB DES NAME = Additional Character 1:
+
+@SYMB DES ITEM = Row for new location
+
+@SYMB DES NAME = Additional Character 2:
+
+@SYMB DES ITEM = Column for new location
+
+This sequence causes subsequent characters to be written starting 
+at the location specified by (<MI>row<D>,<MI>column<D>), the next 
+two characters in the string. In the direct writes the (<MI>row<D>,<MI>column<D>) 
+values are relative to the upper left-hand corner of the screen. In 
+the serial writes the (row,column) values are relative to the current 
+window as defined by the (wt,wl,wb,wr) variables (variable names are 
+mnuemonic for Top, Left, Bottom and Right). The row and column values 
+start numbering at (1,1) not (0,0).
+
+@SYMBOL NAME = Escape Character:
+
+@SYMBOL ITEM = 3
+
+@SYMB DES NAME = Purpose:
+
+@SYMB DES ITEM = Set the cursor location when write is complete
+
+For serial writes, this sequence has no effect since the cursor is 
+always placed at the end of the string (actually after the subsequent 
+prompt). If serial writes have been suppressed then the direct writes 
+can place the cursor using the character 3 sequence. The cursor will 
+be placed at whatever location in the string that the <169>\3<170> 
+sequence would be written if it were a normal character.
+
+@SYMBOL NAME = Escape Character:
+
+@SYMBOL ITEM = 4
+
+@SYMB DES NAME = Purpose:
+
+@SYMB DES ITEM = Disable non-standard escape characters
+
+Most DOS display functions (like the TYPE command) only support a 
+few escape characters. These are the bell (7), backspace (8), tab 
+(9), linefeed (10 dec, 0A hex) and the Carriage Return (13 dec, 0D 
+hex). When the character 4 escape sequence is used all escape characters 
+are turned off except for those mentioned above. This is useful for 
+writing the contents of files which may inadvertently have a few escape 
+characters in them.
+
+@SYMBOL NAME = Escape Character:
+
+@SYMBOL ITEM = 5
+
+@SYMB DES NAME = Purpose:
+
+@SYMB DES ITEM = Display graphic of escape character
+
+@SYMB DES NAME = Usage:
+
+@SYMB DES ITEM = <169>\5ch<170>
+
+@SYMB DES NAME = Additional Character:
+
+@SYMB DES ITEM = The character to display
+
+The escape characters themselves display as a variety of interesting 
+symbols. There may be times that you want to display the symbol. This 
+command allows you to display a single symbol.
+
+For example, the command:
+
+@EXAMPLES = ?rite "\5\5 I feel lucky! \5\5"
+
+@EXAMPLES = <F128M><135><F255D> I feel lucky! <F128M><135><F255D>
+
+Would display the message <169>I feel lucky!<170> with little clovers 
+before and after.
+
+@SYMBOL NAME = Escape Character:
+
+@SYMBOL ITEM = 6
+
+@SYMB DES NAME = Purpose:
+
+@SYMB DES ITEM = Turn off all escapes (except terminating zero)
+
+This command disables all of the escape characters except the terminating 
+zero. It is useful for displaying binary data when debugging or using 
+an unknown file.
+
+@SYMBOL NAME = Escape Character:
+
+@SYMBOL ITEM = 7 or \a
+
+@SYMB DES NAME = Purpose:
+
+@SYMB DES ITEM = To make an audible bell
+
+This is useful to awaken a sluggish user.
+
+@SYMBOL NAME = Escape Character:
+
+@SYMBOL ITEM = 8 or \b
+
+@SYMB DES NAME = Purpose:
+
+@SYMB DES ITEM = To move the write location one column to the left
+
+This is the same as a relative move back one column. It is supported 
+since DOS supports this function.
+
+@SYMBOL NAME = Escape Character:
+
+@SYMBOL ITEM = 9 or \t
+
+@SYMB DES NAME = Purpose:
+
+@SYMB DES ITEM = To go to the next tab stop
+
+This escape character is useful for assuring that columns will be 
+aligned properly when uneven length data is being displayed. The default 
+tab widths is 10 characters which is compatible with IBM mainframe 
+printers and 3780's. PC's normally have tab stops every 8 characters. 
+The TW variable can be used to set the widths to any character value.
+
+@SYMBOL NAME = Escape Character:
+
+@SYMBOL ITEM = 10 dec, 0A hex or \n
+
+@SYMB DES NAME = Purpose:
+
+@SYMB DES ITEM = Move down one line
+
+This is the same as a relative move down one line except that it will 
+scroll if necessary. It does not affect the column setting. This character 
+is usually coupled with a carriage return (<169>\r<170>) to put the 
+location back to column 1.
+
+@SYMBOL NAME = Escape Character:
+
+@SYMBOL ITEM = 11 dec, 0B hex or \v
+
+@SYMB DES NAME = Purpose:
+
+@SYMB DES ITEM = Scroll window <169>##<170> lines
+
+@SYMB DES NAME = Usage:
+
+@SYMB DES ITEM = <169>\11\##<170>
+
+@SYMB DES NAME = Additional Character:
+
+@SYMB DES ITEM = The number of lines to scroll
+
+This sequence can cause the window to scroll any number of lines up 
+or down. It is the only way to get a reverse scroll in the command 
+language since it will accept a negative value. The whole screen will 
+scroll on direct writes. This is not a standard DOS capability. Positive 
+values of ## cause the writing to move up in the window.
+
+@SYMBOL NAME = Escape Character:
+
+@SYMBOL ITEM = 12 dec, 0C hex or \f
+
+@SYMB DES NAME = Purpose:
+
+@SYMB DES ITEM = Clear the video window
+
+This is the <MI>Form Feed<D> escape character. It serves to clear 
+the screen in this video write. DOS functions will merely display 
+a little feminine symbol (stimulating, perhaps, but not that useful).
+
+@SYMBOL NAME = Escape Character:
+
+@SYMBOL ITEM = 13 dec, 0D hex or \r
+
+@SYMB DES NAME = Purpose:
+
+@SYMB DES ITEM = Return to column 1
+
+This is the standard DOS carriage return except that it is relative 
+to the window when doing series writes. It is usually coupled with 
+a linefeed to begin the next line.
+
+@SYMBOL NAME = Escape Character:
+
+@SYMBOL ITEM = 14 dec, 0E hex
+
+@SYMB DES NAME = Purpose:
+
+@SYMB DES ITEM = Toggles the flashing attribute bit
+
+This character is used to make displayed characters flash. The other 
+attributes that are currently being used are left unchanged. To make 
+a part of the string flash merely put a <169>\14<170> before and after 
+the affected portion. The effect only lasts until the end of the string. 
+If the value is not toggled off before the end of the string it will 
+NOT cause the next write to display in flashing mode.
+
+@SYMBOL NAME = Escape Character:
+
+@SYMBOL ITEM = 15 dec, 0F hex
+
+@SYMB DES NAME = Purpose:
+
+@SYMB DES ITEM = Toggles the Intensity attribute bit
+
+This is similar in behavior to the <169>\14<170> character above except 
+that if affects the brightness with which the characters are displayed 
+rather than the flashing. It also does not affect subsequent writes.
+
+@SYMBOL NAME = Escape Character:
+
+@SYMBOL ITEM = 16 dec, 10 hex
+
+@SYMB DES NAME = Purpose:
+
+@SYMB DES ITEM = Toggles automatic use of the graph attribute
+
+This character is used to enable and disable the feature that automatically 
+uses the graph attribute for characters having numbers above 127. 
+This allows the current attribute to be used when necessary. This 
+is useful when using a few graphic characters to construct images 
+that are not borders. It is a toggle but will automatically reset 
+at the end of the string. The value can be permanently disabled by 
+setting the global variable GE to FF hex. It can be re-enabled by 
+setting the variable to 7F hex.
+
+@SYMBOL NAME = Escape Character:
+
+@SYMBOL ITEM = 17 dec, 11 Hex
+
+@SYMB DES NAME = Purpose:
+
+@SYMB DES ITEM = To set video attribute
+
+@SYMB DES NAME = Usage:
+
+@SYMB DES ITEM = <169>\17\##<170>
+
+@SYMB DES NAME = Additional Character:
+
+@SYMB DES ITEM = New Attribute byte 
+
+This changes the video attribute of characters put to the screen until 
+the end of the string or another escape sequence sets the attribute 
+to another value. This is typically used when an unusual attribute 
+is desired for a character or small set of characters. The escape 
+sequences for one of the default, high, key or graph attributes are 
+shorter and, normally, more useful. This is also somewhat less flexible 
+in that the string has to be modified if different value are to be 
+used in different video modes. The other escape sequences can be globally 
+modified at the start by setting the appropriate variables.
+
+@SYMBOL NAME = Escape Character:
+
+@SYMBOL ITEM = 18 dec, 12 Hex
+
+@SYMB DES NAME = Purpose:
+
+@SYMB DES ITEM = To set video attribute back to default
+
+This is used to set the attribute back to the value of the DA variable 
+for direct writes and to the WA variable for the serial (window) writes. 
+The default values in color are bright yellow (0E hex) and white (07 
+hex) respectively. They both default to normal (07 hex) in monochrome.
+
+@SYMBOL NAME = Escape Character:
+
+@SYMBOL ITEM = 19 dec, 13 Hex
+
+@SYMB DES NAME = Purpose:
+
+@SYMB DES ITEM = To set video attribute to change attribute
+
+This is used to set the attribute to the value of the CA variable. 
+The default value in color is bright white (0F hex). The monochrome 
+default to normal (07 hex).
+
+@SYMBOL NAME = Escape Character:
+
+@SYMBOL ITEM = 20 dec, 14 Hex
+
+@SYMB DES NAME = Purpose:
+
+@SYMB DES ITEM = To set video attribute to high attribute
+
+This is used to set the attribute to the value of the HA variable. 
+The default value in color is light cyan (0B hex). The monochrome 
+default is bright (0F hex).
+
+@SYMBOL NAME = Escape Character:
+
+@SYMBOL ITEM = 21 dec, 15 Hex
+
+@SYMB DES NAME = Purpose:
+
+@SYMB DES ITEM = To set video attribute to graph attribute
+
+This is used to set the attribute to the value of the GA variable. 
+The default value in color is bright green (0A hex). The monochrome 
+default is normal (07 hex).
+
+@SYMBOL NAME = Escape Character:
+
+@SYMBOL ITEM = 22 dec, 16 Hex
+
+@SYMB DES NAME = Purpose:
+
+@SYMB DES ITEM = Sets attribute to reverse video as defined by the 
+RA variable.
+
+This sets to the attribute to the value of the RA variable until the 
+end of the string or until another escape sequence modifies the video 
+attribute. The default value of RA is 70 hex in monochrome and 20 
+hex (green background black characters) in color.
+
+@SYMBOL NAME = Escape Character:
+
+@SYMBOL ITEM = 23 dec, 17 Hex
+
+@SYMB DES NAME = Purpose:
+
+@SYMB DES ITEM = To set video attribute to underline attribute
+
+This is used to set the attribute to the value of the UA variable. 
+The default value in color is bright red (0C hex). The monochrome 
+default is underline (01 hex).
+
+@SYMB DES NAME = Characters:
+
+@SYMB ITEM = 24-27 dec, 18-1B Hex
+
+@SYMB DES NAME = Purpose:
+
+@SYMB DES ITEM = Display arrows
+
+Technically, these are not escape characters. They merely display 
+as their IBM character values. The values are:
+
+@LIST = 24 dec	18 hex	Up arrow	<F128M><189><F255D>
+
+@LIST = 25 dec	19 hex	Down arrow	<F128M><191><F255D>
+
+@LIST = 26 dec	1A hex	Right arrow	<F128M><190><F255D>
+
+@LIST = 27 dec	1B hex	Left arrow	<F128M><188><F255D>
+
+@SYMBOL NAME = Escape Character:
+
+@SYMBOL ITEM = 28 dec, 1C Hex
+
+@SYMB DES NAME = Purpose:
+
+@SYMB DES ITEM = To copy the line above
+
+@SYMB DES NAME = Usage:
+
+@SYMB DES ITEM = <169>\28\##<170>
+
+@SYMB DES NAME = Additional Character:
+
+@SYMB DES ITEM = The number of times to copy the line
+
+This is used to copy the line above a number of times. This produces 
+strange results when not used in column one (the prior window widths 
+worth of characters are copied instead of an even line).
+
+@SYMBOL NAME = Escape Character:
+
+@SYMBOL ITEM = 29 dec, 1D Hex
+
+@SYMB DES NAME = Purpose:
+
+@SYMB DES ITEM = Clears an area ahead of the current location
+
+@SYMB DES NAME = Usage:
+
+@SYMB DES ITEM = <169>\29\##<170>
+
+@SYMB DES NAME = Additional Character:
+
+@SYMB DES ITEM = The number locations ahead to clear
+
+This sequence is used to clear an area for a string prior to writing 
+it. It does this by writing a set of number of blanks. The character 
+following the escape character is the number of blanks to write the 
+character. This sequence does not change the write location (subsequent 
+characters will be written over the blanks).
+
+@SYMBOL NAME = Escape Character:
+
+@SYMBOL ITEM = 30 dec, 1E Hex
+
+@SYMB DES NAME = Purpose:
+
+@SYMB DES ITEM = Make a column
+
+@SYMB DES NAME = Usage:
+
+@SYMB DES ITEM = <169>\30\##ch<170>
+
+@SYMB DES NAME = Additional Character 1:
+
+@SYMB DES ITEM = The number of rows in the column
+
+@SYMB DES NAME = Additional Character 2:
+
+@SYMB DES ITEM = The character to write in the column
+
+This sequence is used to create a column on the screen. The column 
+will start at the current location and will go down as many rows as 
+specified by the character <169>##<170> character following the <169>\30<170>. 
+The column will be made using the <169>ch<170> character which follows 
+the <169>##<170>. Once the column is written, the write location will 
+be in the column below the last character written. If drawing a box, 
+the location is where a corner should be written. This sequence will 
+scroll the screen if the column is too long to fit.
+
+@SYMBOL NAME = Escape Character:
+
+@SYMBOL ITEM = 31 dec, 1F Hex
+
+@SYMB DES NAME = Purpose:
+
+@SYMB DES ITEM = Write a character multiple times
+
+@SYMB DES NAME = Usage:
+
+@SYMB DES ITEM = <169>\31\##ch<170>
+
+@SYMB DES NAME = Additional Character 1:
+
+@SYMB DES ITEM = The number of times to write the character
+
+@SYMB DES NAME = Additional Character 2:
+
+@SYMB DES ITEM = The character to write
+
+This sequence is normally used to write horizontal lines or blanks 
+in an efficient manner. The <169>##<170> character is the number of 
+times to write the character and the <169>ch<170> character is the 
+character to write. The write location is set to one column beyond 
+the last character written.
+
+@SECTION HEAD = Status Variables
+
+<$M[Statvars]>The status variables are the ones which appear in the 
+boxes in the upper part of the screen and on the bottom line. These 
+can be made to appear anywhere on the screen with different formats 
+and colors. The different variables which may be displayed are:
+
+@LIST EDGE IND = 0
+
+@LIST I NEAR = Send Mode, an integer value from 0 to 7. It is used 
+to index an array of strings which are:
+
+@Z_TBL_BEG = COLUMNS(2), DIMENSION(IN), WIDTH(4.7500), HGUTTER(.0560), 
+VGUTTER(.0560), BOX(Z_DOUBLE), HGRID(Z_SINGLE), VGRID(Z_SINGLE), KEEP(ON), 
+ALIGN(RT), L2(R1C0..R1C2)
+
+@Z_TBL_BODY = TABLE TEXT, TABLE TEXT
+
+Value<$!B11>, Meaning<$!B11>
+
+0, <169>Std. Vary   <170>
+
+1, <169>Std. Fixed  <170>
+
+2, <169>Std. Binary <170>
+
+3, <169>Std. Hex    <170>
+
+4, <169>Tran. Vary  <170>
+
+5, <169>Tran. Fixed <170>
+
+6, <169>Tran. Binary<170>
+
+7, <169>Tran. Hex   <170>
+
+@Z_TBL_END = 
+
+@LIST I NEAR = The values of these strings cannot be changed yet but 
+the option will be added soon. This is true of any of the strings 
+that represent names for the status variables.
+
+@LIST EDGE IND = 1
+
+@LIST I NEAR = Current Directory, This string is normally displayed 
+on line 2. It is a varying length string so the format string should 
+contain escape sequences to erase the prior value. See the second 
+example in Section <$R[S*,Statforms]8.6> for more information.
+
+@LIST EDGE IND = 2
+
+@LIST I NEAR = Bytes Received. This is the number of bytes received 
+on the last or current reception. By default it is displayed when 
+receiving but not when sending so it can occupy the same space as 
+Bytes Sent below. This is a long data type, the <169>l<170> option 
+must be included in the format string specification (see Sections 
+<$R[S*,Formops]6.8> and <$R[S*,Cform]8.9>). The third example in Section 
+<$R[S*,Statforms]8.6> is for this variable.
+
+@LIST EDGE IND = 3
+
+@LIST I NEAR = Bytes Sent. This is the number of bytes sent in the 
+current or last transmission. This is also a long value.
+
+@LIST EDGE IND = 4
+
+@LIST I NEAR = This is the Printer Auto-Naming option, 0 displays 
+as <169>No <170> and 1 displays as <169>Yes<170>.
+
+@LIST EDGE IND = 5
+
+@LIST I NEAR = Printer Filename. This is also a varying length string.
+
+@LIST EDGE IND = 6
+
+@LIST I NEAR = Printer Standard Conversion. This is the conversion 
+type for a standard receptions to the printer. The values and corresponding 
+messages are:
+
+@Z_TBL_BEG = COLUMNS(2), DIMENSION(IN), WIDTH(4.7500), HGUTTER(.0560), 
+VGUTTER(.0560), BOX(Z_DOUBLE), HGRID(Z_SINGLE), VGRID(Z_SINGLE), KEEP(ON), 
+ALIGN(RT), L2(R1C0..R1C2)
+
+@Z_TBL_BODY = TABLE TEXT, TABLE TEXT
+
+Value<$!B11>, Meaning<$!B11>
+
+0, <169>Vary  <170>
+
+1, <169>Fixed <170>
+
+2, <169>Binary<170>
+
+3, <169>Hex   <170>
+
+@Z_TBL_END = 
+
+@LIST EDGE IND = 7
+
+@LIST I NEAR = Printer Transparent Conversion. Same values as 6 above.
+
+@LIST EDGE IND = 8
+
+@LIST I NEAR = Punch Auto-Naming option same as 4 except for punch.
+
+@LIST EDGE IND = 9
+
+@LIST I NEAR = Punch Filename. Same as 5 except for punch.
+
+@LIST EDGE IND = 10
+
+@LIST I NEAR = Punch Standard Conversion. Same values as 6 above.
+
+@LIST EDGE IND = 11
+
+@LIST I NEAR = Punch Transparent Conversion. Same values as 6 above.
+
+@LIST EDGE IND = 12
+
+@LIST I NEAR = Receive Block count. This is an integer. It displays 
+in the <169>Blocks<170> field during a reception (by default).
+
+@LIST EDGE IND = 13
+
+@LIST I NEAR = Receive Enquiry Count. Another integer, It displays 
+in the <169>Enquiries<170> field during a reception (by default).
+
+@LIST EDGE IND = 14
+
+@LIST I NEAR = Receive Nak count. Integer, displays in <169>Naks<170> 
+field.
+
+@LIST EDGE IND = 15
+
+@LIST I NEAR = Send block Count. This integer displays in the <169>Blocks<170> 
+field during a Send.
+
+@LIST EDGE IND = 16
+
+@LIST I NEAR = Printer destination, displays as <169>Printer<170> 
+or <169>Punch <170>.
+
+@LIST EDGE IND = 17
+
+@LIST I NEAR = Send filename. Varying length so it requires a clear 
+sequences.
+
+@LIST EDGE IND = 18
+
+@LIST I NEAR = Send Enquiry Count. Integer.
+
+@LIST EDGE IND = 19
+
+@LIST I NEAR = Send Nak Count. Integer.
+
+@LIST EDGE IND = 20
+
+@LIST I NEAR = This status variable is used for the <169>R<170> and 
+<169>S<170> in the upper left part of the lower right box on the default 
+screen. It is <169>S<170> when sending, <169>R<170> when receiving 
+and does not display anything otherwise (it, however, will not overwrite 
+the prior <169>R<170> or <169>S<170> when not communicating).
+
+@LIST EDGE IND = 21
+
+@LIST I NEAR = Status Value. This generates the bottom line in the 
+default screen. Its possible values are:
+
+@Z_TBL_BEG = COLUMNS(2), DIMENSION(IN), WIDTH(4.7500), HGUTTER(.0560), 
+VGUTTER(.0560), BOX(Z_DOUBLE), HGRID(Z_SINGLE), VGRID(Z_SINGLE), KEEP(ON), 
+ALIGN(RT), L2(R1C0..R1C2)
+
+@Z_TBL_BODY = TABLE TEXT, TABLE TEXT
+
+Value<$!B11>, Meaning<$!B11>
+
+0, <169>    Offline     <170>
+
+1, <169>Waiting for Call<170>
+
+2, <169>   Connecting   <170>
+
+3, <169>    Dialing     <170>
+
+4, <169> Got Dial Tone  <170>
+
+5, <169>    Ringing     <170>
+
+6, <169>Modem Handshake <170>
+
+7, <169>     Online     <170>
+
+8, <169>    Sending     <170>
+
+9, <169>   Receiving    <170>
+
+@Z_TBL_END = 
+
+@LIST I NEAR = See the example format string in Section <$R[S*,Statforms]8.6> 
+for this one.
+
+@LIST EDGE IND = 22
+
+@LIST I NEAR = This generates the <169>s<170> and <169>t<170> beside 
+the <169>R<170> and <169>S<170>. It is <169>s<170> if the last send 
+or receive was standard and <169>t<170> if the last send or receive 
+was transparent.
+
+@LIST EDGE IND = 23
+
+@LIST I NEAR = This is the date. It is passed by two integers: month 
+and day. Year is passed as a string. The order is month, day, year. 
+See the example format string in Section <$R[S*,Statforms]8.6> for 
+this one.
+
+@LIST EDGE IND = 24
+
+@LIST I NEAR = Time, in hour, minutes and second. See the example 
+format string for this one.
+
+The locations, colors, times and many other details of how these options 
+are displayed is under your control. The options used to control these 
+are:
+
+@LIST = format string
+
+@LIST = status mask
+
+@LIST = maximum length parameter (for strings only)
+
+The format string is the most significant of these.
+
+@SECTION HEAD = The Status Variable Format String
+
+<$M[Statforms]>The format string determines the location, color and 
+other details of how the Status Variable is displayed. It can contain 
+any of the sequences from Section <$R[S*,Videscs]8.4> and also contains 
+a format specification which is the same as the one used in the C 
+programming language's <169>printf<170> statement. This string typically 
+has four or five components:
+
+@LIST EDGE IND = 1
+
+@LIST I NEAR = Attribute (color) Escape sequences
+
+@LIST I EXT = These are sequences from Section <$R[S*,Videscs]8.4>. 
+The sequences 12-17 are recommended to be the first byte of the format 
+string. In fact, 7 of the status variables require that the first 
+byte be one of these sequences (if the variable is displayed at all). 
+These are:
+
+@Z_TBL_BEG = COLUMNS(2), DIMENSION(IN), COLWIDTHS(E2,E3), WIDTH(4.7500), 
+HGUTTER(.0560), VGUTTER(.0560), BOX(Z_DOUBLE), HGRID(Z_SINGLE), VGRID(Z_SINGLE), 
+KEEP(ON), ALIGN(RT), L2(R1C0..R1C2)
+
+@Z_TBL_BODY = TABLE TEXT, TABLE TEXT
+
+Status Variable Number<$!B11>, Description<$!B11>
+
+5, Printer Filename
+
+6, Printer Standard Conversion
+
+7, Printer Transparent Conversion
+
+9, Punch Filename
+
+10, Punch Standard Conversion
+
+11, Punch Transparent Conversion
+
+17, Send Filename
+
+@Z_TBL_END = 
+
+@LIST I EXT = The reason these must begin with the attribute byte 
+is because the color is switched dynamically while a transmission 
+or reception is going on. The first character of the format string 
+is dynamically switched between the Change attribute setting (when 
+idle) and the High attribute setting (when active).
+
+@LIST I EXT = The escape sequences are processed from left to right 
+so the highlighting of the active printer/punch/send filenames can 
+be disabled by following the first attribute setting byte with another 
+to cancel its affect.
+
+@LIST I EXT = Other format strings do not have any special requirements 
+concerning escape sequences for setting attributes.
+
+@LIST EDGE IND = 2
+
+@LIST I NEAR = The location to display the variable. This must be 
+included since the variable will be displayed at a semi-random location 
+if it is not. The <169>\2<170> escape sequence is used to set the 
+location.
+
+@LIST EDGE IND = 3
+
+@LIST I NEAR = The format specification (like C's printf). This is 
+necessary if the variable is going to be displayed. The format spec 
+begins with a percent sign ('%') and is followed by characters which 
+describe the way in which the variable will be displayed. The other 
+characters are very similar to format options used in the RITE and 
+DRITE commands. Section <$R[S*,Cform]8.9> is on the C format specification.
+
+@LIST EDGE IND = 4
+
+@LIST I NEAR = A NULL (true zero) at the end of the format string 
+to terminate it.
+
+Other parts of the format string are normally printable characters. 
+These characters are displayed as they would be with a normal direct 
+video write (see the DRITE function).
+
+@MINOR HEAD = Example 1 (Format string for Send Mode)
+
+A format string for the Send Mode (status variable 0)
+
+@LIST = <169>\19\2\5\47%s\0<170>
+
+@OUTDENT ITEM = The <169>\19<170> sets the color to that Change video 
+attribute. By default it is white on color screens and normal on monochrome 
+screens. The built in variable CA can be used to modify the affect 
+of the <169>\19<170> (same as \x13).
+
+@OUTDENT ITEM = The <169>\2\5\47<170> causes the value to be displayed 
+at row 5 and column 47. The rows and columns are numbered starting 
+at row 1, column 1 in the upper left-hand corner.
+
+@OUTDENT ITEM = The <169>%s<170> is the format specification used 
+to display the string.
+
+@OUTDENT ITEM = The <169>\0<170> terminates the format string.
+
+The Send Mode format is a typical format string.
+
+@MINOR HEAD = Example 2 (Current Directory)
+
+This example is for the current directory display (status variable 
+1)
+
+@LIST = <169>\19\2\2\23\29\27%s\0<170>
+
+@OUTDENT ITEM = The <169>\19<170> sets the color.
+
+@OUTDENT ITEM = The <169>\2\2\23<170> moves to location row 2, column 
+23.
+
+@OUTDENT ITEM = The <169>\29\27<170> erases the previous directory 
+name (does not advance location).
+
+@OUTDENT ITEM = The <169>%s\0<170> are the format string and string 
+terminator (same first example).
+
+The clearing of the prior string is needed for strings which have 
+varying lengths to avoid retaining old characters. In general, the 
+status variables which display as strings (conversion types, send 
+mode, etc.) have blanks filled to the left to assure that the the 
+next value will completely overwrite the prior value.
+
+Also, the status variables are only re-displayed when the values change 
+so there is not a flickering effect when a string is cleared and then 
+immediately rewritten.
+
+@MINOR HEAD = Example 3 (Bytes Received)
+
+This example is for the bytes received variable (number 2).
+
+@LIST = <169>\19\2\7\62%-10lu\0<170>
+
+@OUTDENT ITEM = The <169>\19\2\7\62<170> set the color and location.
+
+@OUTDENT ITEM = The format specification is <169>%-10lu<170>.
+
+@OUTDENT ITEM = The <169>-<170> causes the display to be left justified.
+
+@OUTDENT ITEM = The <169>10<170> makes sure that 10 blanks are written 
+to the right (this clears any prior value from that location).
+
+@OUTDENT ITEM = The <169>l<170> is necessary because the bytes received 
+is a long value.
+
+@OUTDENT ITEM = The <169>u<170> is for unsigned decimal display.
+
+@OUTDENT ITEM = The <169>\0<170> terminates the string.
+
+@MINOR HEAD = Example 4 (Status Value)
+
+This example is for the Status Value variable, number 21.
+
+@LIST = <169>\2\25\1\22\29\80\2\25\32%s\0<170>
+
+@OUTDENT ITEM = The <169>\2\25\1<170> sets location to bottom row 
+(25) and column 1.
+
+@OUTDENT ITEM = The <169>\22<170> sets color to reverse video (determined 
+by the RA variable).
+
+@OUTDENT ITEM = The <169>\29\80<170> writes a full line of reverse 
+video blanks.
+
+@OUTDENT ITEM = The <169>\2\25\32<170> goes to the location where 
+the string is to be written.
+
+@OUTDENT ITEM = The <169>%s\0<170> is the format specifier and string 
+terminator.
+
+The strings are center justified by having the display values centered 
+within their length (See the values in Section <$R[S*,Statvars]8.5>). 
+The names for the different states will be added shortly so the centering 
+affect will be able to be achieved for any of the values which display 
+as strings.
+
+@MINOR HEAD = Example 5 (Date Variable)
+
+This example is for the Date variable, number 23.
+
+@LIST = <169>\19\2\2\13%d/%d/%s\0<170>
+
+@OUTDENT ITEM = The <169>\19\2\2\13<170> sets the attribute and location.
+
+@OUTDENT ITEM = The <169>%d<170> sets the format for the month.
+
+@OUTDENT ITEM = The <169>/<170> is printed.
+
+@OUTDENT ITEM = The second <169>%d<170> is for the day.
+
+@OUTDENT ITEM = The second <169>/<170> is printed.
+
+@OUTDENT ITEM = The <169>%s<170> is needed because the year is passed 
+in as a two character string.
+
+@OUTDENT ITEM = The <169>\0<170> terminates the format string.
+
+@MINOR HEAD = Example 6 (Time Variable)
+
+This example is for the Time variable, number 24.
+
+@LIST = <169>\19\2\2\3%.2d:%.2d:%.2d\0<170>
+
+@OUTDENT ITEM = The <169>\19\2\2\3<170> determine the attribute and 
+location.
+
+@OUTDENT ITEM = The <169>%.2d<170>'s cause the values to be displayed 
+with so that they always occupy 2 locations with a leading zero on 
+the left if necessary.
+
+@OUTDENT ITEM = The <169>:<170>'s are displayed between the values
+
+@OUTDENT ITEM = The <169>\0<170> terminates the format string.
+
+@SECTION HEAD = The Status Mask value
+
+<$M[Statmasks]>The status mask value (one byte) associated with each 
+status variable determines whether it will be displayed or not. The 
+status mask value is bitwise and'ed against an internal variable to 
+determine if the variable will be displayed. If any bits are non-zero 
+after anding, the status variable will be displayed. The bits in the 
+internal variable are as follows:
+
+@Z_TBL_BEG = COLUMNS(2), DIMENSION(IN), COLWIDTHS(E1,E4), HGUTTER(.0560), 
+VGUTTER(.0560), BOX(Z_DOUBLE), HGRID(Z_SINGLE), VGRID(Z_SINGLE), KEEP(ON), 
+L2(R1C0..R1C2)
+
+@Z_TBL_BODY = TABLE TEXT, TABLE TEXT
+
+Bit<$!B11>, Meaning<$!B11>
+
+0, Always 1
+
+1, 1 If sending,, 0 otherwise
+
+2, 1 if receiving,, 0 otherwise
+
+3, 1 if the printer is defined to be active,, 0 if punch
+
+4, 1 if the punch is defined to be active,, 0 if printer
+
+5, Always 0 (Do not rely on this,, reserved for expansion)
+
+6, Always 0 (Do not rely on this,, reserved for expansion)
+
+7, Always  0 (will remain 0)
+
+@Z_TBL_END = 
+
+Bit 0 is always 1 so a mask value of 1 will cause the status variable 
+to always be displayed (if its value is changed). The default masks 
+of all status variables except 2,3,12,13,14,15,18 and 19 are 1.
+
+Bits 1 and 2 are not complements. If neither a receive or send is 
+going on then both bits will be 0. A mask of 02 hex will cause a status 
+variable to be updated only when sending and a mask of 04 hex will 
+cause a status variable to be updated only when receiving.
+
+Status variables 3,15,18 and 19 have 02 as their default mask and 
+variables 2,12,13 and 14 have 04 as their default mask. This allows 
+any of 3,15,18 or 19 to occupy the same place on the screen as any 
+of 2,12,13 or 14.
+
+Since nothing will be written for these values when neither a send 
+or receive is going on the value of the last send or receive will 
+persist until a new send or receive occurs.  When the package is loaded, 
+neither bit will be 1 so the portion of the screen in which a send/receive 
+variable is written will be blank. In the default <$R[V*,Packname]D3-3780> 
+screen <169>0<170>'s are explicitly written out in the screen itself 
+to stop these locations from being blank.
+
+Bits 3 and 4 are complements of one another. The active destination 
+is always one or the other even if a receive is currently not going 
+on. The initial value is set to the printer and afterwards will be 
+set to whichever was the last to receive data.
+
+The FMASK command is used to set the value of this mask.
+
+@SECTION HEAD = The Status Variable Maximum Length value
+
+<$M[Statlens]>The maximum length value is used to truncate variable 
+length strings so that they won't overwrite other parts of the screen 
+when they get too long. The length parameter is used in the default 
+package for filenames (filespecs) and the current directory. The strings 
+are truncated on the left leaving the rightmost characters. The rightmost 
+characters in a filename are generally more relevant than the leftmost 
+so little information is lost when the maximum length parameter operates 
+on a filename. If truncation on the right is desired for some values, 
+the precision value of the format string can be used to limit the 
+number of characters displayed. The FMAX command is used to set the 
+maximum length values.
+
+@SECTION HEAD = The C format specification
+
+<$M[Cform]>Section <$R[S*,Formops]6.8> covers the format options for 
+writing strings out with the rite functions of <$R[V*,Packname]D3-3780>. 
+Status variables format strings, however, use actual C format specifications. 
+These format parameters differ from Section <$R[S*,Formops]6.8> in 
+only a few ways. Characteristics for C formats are:
+
+@BULLET = Case is significant, the upper-case values will not necessarily 
+work
+
+@BULLET = The string must be preceded by a '%' sign
+
+@BULLET = The 'R' for carriage return is not supported
+
+The following reiterates most of what is in Section <$R[S*,Formops]6.8> 
+(However, Section <$R[S*,Formops]6.8> has examples).
+
+Here is a simplified explanation of the fields of a format statement:
+
+@LIST = %[flags][width][.precision][l]type
+
+Each field of the format specification is a single character or number 
+signifying a particular format option. The following describes each 
+field.
+
+@LIST EDGE = Type:
+
+@LIST I NEAR = The 'type' character determines whether the associated 
+argument is interpreted as a character, string, or number. The simplest 
+format specification contains only a percent sign and a 'type' character. 
+(For example: %s prints a string.) The 'type' characters are:
+
+@Z_TBL_BEG = COLUMNS(3), DIMENSION(IN), COLWIDTHS(E1,E2,E7), WIDTH(4.7500), 
+HGUTTER(.0560), VGUTTER(.0560), BOX(Z_DOUBLE), HGRID(Z_SINGLE), VGRID(Z_SINGLE), 
+KEEP(ON), ALIGN(RT), L2(R1C0..R1C3)
+
+@Z_TBL_BODY = TABLE TEXT, TABLE TEXT, TABLE TEXT
+
+Type<$!B11>, Variable<$!B11>, Displays<$!B11>
+
+d, Integer, Signed Decimal
+
+i, Integer, Signed Decimal
+
+u, Integer, Unsigned Decimal
+
+o, Integer, Unsigned Octal
+
+x, Integer, Unsigned Hexadecimal (abcdef)
+
+X, Integer, Unsigned Hexadecimal (ABCDEF)
+
+c, Character, Single Character
+
+s, String, Characters are printed up to the first hex 0 or until <169>precision<170> 
+is reached
+
+@Z_TBL_END = 
+
+@LIST EDGE = Flags:
+
+@LIST I NEAR = An optional sequence of flag characters controls the 
+justification of output and printing of signs, blanks, decimal points, 
+and octal and hexadecimal prefixes. The flag characters available 
+are:
+
+@Z_TBL_BEG = COLUMNS(3), DIMENSION(IN), COLWIDTHS(E1,E5,E3), WIDTH(4.7500), 
+HGUTTER(.0560), VGUTTER(.0560), BOX(Z_DOUBLE), HGRID(Z_SINGLE), VGRID(Z_SINGLE), 
+KEEP(ON), ALIGN(RT), L2(R1C0..R1C3)
+
+@Z_TBL_BODY = TABLE TEXT, TABLE TEXT, TABLE TEXT
+
+Flag<$!B11>, Action<$!B11>, Default<$!B11>
+
+<169>-<170>, Left justify within the field width, Right justify
+
+<169>+<170>, Prefix the output value with a + or - sign if it is of 
+a signed type, Sign appears only for negative values
+
+blank, Prefix the value with a blank if signed and positve, No Blank
+
+<169>#<170>, When used with the o,, x,, or X the # flag prefixes any 
+nonzero output with 0,, 0x or 0X respectively, No Prefix
+
+@Z_TBL_END = 
+
+@LIST I NEAR = More than one flag can appear in a format specification.
+
+@LIST EDGE = Width:
+
+@LIST I NEAR = The optional width specifier is a nonnegative decimal 
+integer specifying the minimum number of characters to print, padding 
+with blanks and zeros. Width never causes a value to be truncated.
+
+@LIST EDGE = Precision:
+
+@LIST I NEAR = An optional precision specifier is a nonnegative decimal 
+integer preceded by a period (.) which specifies the maximum number 
+of characters printed for all or part of the output field, or the 
+minimum number of digits printed for integer values. Precision can 
+cause truncation of the output value. Here's how precision can affect 
+different types:
+
+@LIST EDGE IND = d,i,o,u,x,X:
+
+@LIST ITEM = With any of these types, precision specifies the minimum 
+number of digits to be printed. If number of digits is less than specified 
+in precision, output is padded on the left with zeros. The value is 
+not truncated when the number of digits exceeds precision. By default, 
+if precision is 0 or omitted, the precision is set to 1.
+
+@LIST EDGE IND = c:
+
+@LIST ITEM = Precision has no effect. By default, one character is 
+printed.
+
+@LIST EDGE IND = s:
+
+@LIST ITEM = Precision specifies the maximum number of characters 
+to be printed. Characters in excess of precision are not printed; 
+the rightmost excess characters are dropped. By default, characters 
+are printed until a null character is encountered. Note that the maxlen 
+value (set by the FMAX command) will leave the rightmost characters 
+and is therefore somewhat complementory to the precision specification.
+
+@LIST EDGE = Mandatory l:
+
+@LIST I NEAR = The two status variables Bytes Received (2) and Bytes 
+Sent (3) require that an <169>l<170> precede the type element since 
+these variables are of a the <169>long<170> data type. These values 
+are long since they can be larger than 65535. Other variables should 
+not have an <169>l<170> preceding the type specifier.
+
+

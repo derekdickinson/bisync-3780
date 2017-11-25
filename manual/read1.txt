@@ -1,0 +1,46 @@
+@CHAPTER HEAD = General Information
+
+<$M[Geninfo]>This is a manual for the the <$R[V*,Packname]D3-3780> 
+software from D3 Softdesign. It is intended to augment the UDS Dial 
+manual. This manual contains enough information to operate and (hopefully) 
+customize <$R[V*,Packname]D3-3780> for your application. First, a 
+little about what <$R[V*,Packname]D3-3780> does and its intended applications.
+
+<$R[V*,Packname]D3-3780> works with Universal Data Systems' Sync-Up 
+modems to emulate an IBM 3780 work station. It should work with any 
+device that follows IBM's Bisynch 3780 protocol and is operating over 
+a compatible modem. For the sake of brevity, I will refer to an IBM 
+3780 work station or any device that emulates a 3780 work station 
+as merely a <169>3780<170> for the remainder of this document.
+
+The current version of <$R[V*,Packname]D3-3780> can work by itself 
+or in conjunction with UDS' dialer which is included on the <$R[V*,Packname]D3-3780> 
+disk. <$R[V*,Packname]D3-3780> has built in dialing and auto answer 
+capabilities but the setting of the modem options is not convenient 
+(the options must be entered in hexadecimal) without using UDS' dialer.
+
+The files on your <$R[V*,Packname]D3-3780> disk are:
+
+@BULLET = <$R[V*,Packname]D3-3780>.EXE
+
+@BULL DES = The <$R[V*,Packname]D3-3780> 3780 emulator
+
+@BULLET = <$R[V*,Packname]D3-3780>.CFG
+
+@BULL DES = The configuration file
+
+@BULLET = PACKINST.EXE
+
+@BULL DES = A program for additional customization
+
+@BULLET = MODEMS.DTA
+
+@BULL DES = Modem design information 
+
+<$R[V*,Packname]D3-3780> is normally sold with script files that customize 
+it for a specific application. The <169><$R[V*,Packname]D3-3780><170> 
+name is changed and the end user does not get script writing information. 
+This document is for someone who is setting up the scripts to work 
+with their application.
+
+

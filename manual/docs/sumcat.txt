@@ -1,0 +1,155 @@
+dest = :label | line number
+ptr  = any pointer type { strings, buffers or pointers }
+num  = any scalar, other values are assumed
+val  = num|ptr
+file = a filename (no wildcards)
+spec = a filename (wildcards allowed)
+
+
+Sending Command
+_____________________________________________________________________________
+s spec[;ppp][+spec[;ppp]]... ppp  works : Send a file or message to the remote's printer,
+
+Connection Commands
+_____________________________________________________________________________
+c                                 works : Go off hook in private line mode
+m                                 works : Perform Manual Connect
+aa[,+timeout]|[,hh:mm]            works : Should set modem to answer the phone
+dl,ptr | file                     works : Dial the phone number
+
+Receive Control and Setup
+_____________________________________________________________________________
+w[,timeout]                       works : Wait for communication to occur
+dn,file,ops                       works : Define Punch
+dp,file,ops                       works : Define Printer
+
+Line Control
+_____________________________________________________________________________
+ds                                works : Disconnect
+fq                                works : Forced quit, drop line leave without informing
+kl                                wo--- : Kill current activity
+
+Modem Stuff
+_____________________________________________________________________________
+mome ptr;op                       works : Send message to the modem
+mo                                works : Get Modem options
+mv                                works : Modem Version
+so,file|ptr                       works : Set Modem options from file
+
+Diagnostic stuff
+_____________________________________________________________________________
+dt,file                           ----- : Dump Trace
+lf,file                           works : List file command
+ss                                works : Send Statistics
+st                                works : Statistics
+tr                                ----- : Trace
+vals                              works : Dumps variable values
+svals                             works : Sends variables
+
+DOS functions
+_____________________________________________________________________________
+>[dos command]                    works : Call DOS (press key before return)
+.[dos command]                    works : Same as above
+/[dos command]                    works : Call DOS (return immediately)
+
+General
+_____________________________________________________________________________
+*[Anything you want]              works : Delimits a comment, batch only
+p[,+timeout]|[,hh:mm]             works : Delay for a certain number of 1/10 second
+q[,errorlevel]                    works : Drop the line and quit the session.
+da                                works : The modem is always in data mode
+ex[,errorlevel]                   works : Exit without dropping the line
+td                                works : Display Time and date
+tk                                ----- : Set to talk mode
+cls                               works : Clears cmd window
+rem "command"[+"command"]...      works : Remote command
+help                              works : Should supply a general help
+?[,D3-3780 command]               works : Should supply a command summary.
+
+Branching Functions
+_____________________________________________________________________________
+go,dest                           works : Go to line number or label - batch only.
+if,dest[,dest]                    works : If conditional iferror goto wherever
+il,num                            works : Instruction loop count
+on,v,num[;num]=dest,...           works : Multy way branch
+enz                               works : Exit and set errorlevel if ei is non zero
+qnz                               works : Quit and set errorlevel if ei is non zero
+xb,file                           works : Execute batch file
+ifi val=val,dest,dest             works : If identical string or numeric compare
+ifs ptr=ptr,dest,dest             works : If matched until end of leftmost string
+ife spec,dest,dest                works : If file exists
+ifp error,dest,dest               works : If error, rcv printer, rcv punch
+ifef num,dest,dest                works : Branches to dest one if End of ile
+ift file=file,dest,dest,dest      works : Compare time stamps of files
+
+Numeric Manipulations
+_____________________________________________________________________________
+dec val                           works ; i3=i3-1
+inc val                           works ; i5=i5+1  Numbers or pointers
+mov val,val                       works ; Assigment  (dest,source)
+opr val,num,'X'                   works ; Any two numeric values ( i0=i0-*p0 )"+-*/|&^%><"
+
+Display Options
+_____________________________________________________________________________
+sup                               works : Suppress all output except "rite"
+unsup                             works : Restore output
+rite val;ops+val;ops+...          works : Display formatted text to screen.
+
+String Manipulation
+_____________________________________________________________________________
+cat ptr,ptr                       works : Concatenate two strings
+cpy ptr,ptr[,val]                 works ; String copy
+sts ptr,ptr,'V'                   works ; Assign pointer value to first 'V' in buffer
+srite ptr,val;ops+val;ops+...     works ; Like show only to string
+stst ptr,ptr,ptr                  works ; Assign the location of ptr3 in ptr2 to ptr1
+upr val                           works ; Convert chars in buffer to uppercase
+lwr val                           works ; Convert chars in buffer to lowercase
+setbf ptr,num[,num]               works ; Sets the contents of a buffer to a value
+
+General File Manipulation
+_____________________________________________________________________________
+er,spec                           works : Erase file
+ld[,spec]                         works : List Directory
+app ptr,file[,val]                works : Append data from a buffer to a file
+del spec                          works : Same as er
+dir[,spec]                        works : Same as ld
+ren oldspec newspec               works : Rename
+load ptr,file[,val]               works : Load data into location pointed to by %p0
+save ptr,file[,val]               works : Save data from  "   "     "    "
+size num[;num],file               works : Assigns size in bytes of file to num
+
+File Manipulation using handles
+_____________________________________________________________________________
+astat                             works : Display status of all Open files
+clall                             works : Close all open files
+close num                         works : Close file designated by num
+frite num,val;ops+val;ops+...     works : Write formatted data to file num
+fstat num                         works : Display status of file, sets ei if not open
+gbuf num,ptr[,val]                works : Get data from file and put it in ptr
+open num,file[;ops]               works : Open file designated by num
+pbuf num,ptr[,val]                works : Put data in buffer
+read num,val;ops+val;ops+...      works : Read formatted data from file num
+seek num,num[,num]                works : Seek to location in file
+tell num,num                      works : Tell current file position
+
+Buffer Control Functions - These do not affect the file functions
+_____________________________________________________________________________
+buf ptr[,val][;op]                works : Store incoming data in buffer
+bdp ptr[,val][;op]                works : Store incoming printer data in buffer
+bdn ptr[,val][;op]                works : Store incoming punch data in buffer
+
+More stuff
+_____________________________________________________________________________
+key num,val;ops+val;ops+...       works : Display message, get key, put key in num
+intrp ptr                         works : Run the string through the interpreter
+sptr num,ptr,ptr                  works : Subtract ptrs put result in num
+blksz num                         works : Set transmit blocksize
+
+Completely Unwritten 0 -  3
+Initial coding       1 -  0
+Limited Testing      2 -  1
+Half working         3 -  0
+Mostly working       4 -  0
+Practically Complete 5 - 87
+                        ---
+                         91

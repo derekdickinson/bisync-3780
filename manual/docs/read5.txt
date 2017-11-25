@@ -1,0 +1,814 @@
+5.0 Batch Mode
+
+Batch mode has special variables and functions that are useful to it.  Most
+of these are also available in interactive mode but are not particularly
+useful there.  They are left in primarily to allow the person writing batch
+files to more easily check out a function's behavior.
+
+5.1 Built in Variables
+
+D3-3780 maintains several variables that can be modified and branched of
+off in batch mode.  Actually, these variables can be modified and displayed
+interactively since I felt it may be convenient to experiment with them
+in that mode.  All variables are integers unless otherwise mentioned.  The 
+variables and their suggested uses are listed below:
+
+ae    : ASCII to EBCDIC conversion table.  This is the table used to convert
+        the ASCII data files on the PC to EBCDIC on the line when sending
+        using the "Vary" or "Fixed" buffer types.  The variable is Read/Write
+        so individual table entries can be changed if necessary.  This table
+        is only 128 bytes long.  PC characters above 7F hex have their 8th
+        bit cleared before being converted (this is why PC graphic characters
+        cannot be sent in the "Vary" or "Fixed" modes).
+
+as    : Add separator.  This option only has an effect when sending using the
+        "Vary" buffer type and the record is longer that the blocksize.  If
+        the value of "AS" is 1 then a Record Separator character will be 
+        added to the stream at the end of the block if it is a 0 it will not
+        be.
+
+ba    : Base Address this integer value is the lowest numbered I/O port 
+        address of the modem.  The modem occupies the sixteen locations
+        starting at this number in the port address space (actually, in
+        the non-PS/2 modems the modem also occupies four images in the
+        address space since bits 14 and 15 are not decoded).
+
+bk    : Bad Acknowledgment Limit.  This is the maximum number of bad
+        acknowledgments to accept before generating an error.  A zero
+        value will cause it to try forever.
+
+bl    : Blocksize, this variable is the current size of the send blocksize.
+        It can be both read and assigned to with the desired effect.  
+        D3-3780 can accept blocksizes up to 5000 bytes per block.
+
+br    : Blocks received in last or current reception.  This value is read
+        only.
+
+bs    : Blocks sent in last transmission.  This value is also read only.
+
+ca    : The Change attribute variable.  This is the attribute which is used
+        when "\19" escape character is encountered in a video write.  It is
+        also the value which is used when the highlighted filenames are
+        returned to another value.  It defaults to white on color screens 
+        and normal on monochrome screens.  See sections 8.1 and 8.3 for
+        more on attribute variables.
+
+cc    : Cursor Column location.  This value is read only.
+
+co    : Compression.  If this value is 1 then space compression is enabled
+        otherwise space compression is disabled.  Compression only affects
+        sending with the "Vary" buffer type.
+
+cf    : Command File.  The name of the currently executing batch file.
+        Not relevant in interactive mode.  This value cannot be written
+        to unless it is the configuration file which is executing.  The
+        command file will execute when the configuration file is done
+        if the "-F" command line parameter has been specified or the
+        "DP" value is set to 'F'.
+
+cl    : Command Line.  The line of the command (batch) file which is
+        currently executing.  The first line is number 1 and the number 
+        down from there.
+
+cr    : Cursor Row location.  This value is read only.
+
+da    : Default Attribute.  This is the default video attribute used in 
+        direct video writes.  It is used if no attribute is specified or
+        after the "\18" escape sequence is used.  See sections 8.1 and 8.3 
+        for more on attribute variables.
+
+db    : Data Buffer.  This is a pointer which is typically used as a data
+        buffer by allocating space to it using the "ALLOC" function.  Some
+        functions expect to use pointers into this buffer.  This will
+        probably not be true in the future.
+
+dd    : Date-Day.  The current day of the month.  Read Only.
+
+dm    : Date-Month.  The current month.  Read Only.
+
+dp    : This is the Dash Parameter value that was passed on the DOS command
+        line.  An 'F' can be assigned to it in the configuration file to
+        cause batch processing to be used instead of interactive.  The name
+        of the batch file will default to the "D3-3780.CMD" but can be
+        assigned a value in the start up file (see "CF" above).
+
+dr    : The current directory.  String type, Read Only.
+
+ds    : Disk Space.  If the disk space is less than 65535 this value will be
+        the amount of available disk space on the logged drive.  Otherwise
+        the value of ds will be 65535.
+
+dy    : Date-Year.  The current year.  Read Only.
+
+ea    : EBCDIC to ASCII conversion table.  This is the conversion table used
+        to convert from EBCDIC on the line to ASCII in the PC when receiving
+        using the "Vary" or "Fixed" types.  It is Read/Write and is 256 bytes
+        long.
+
+ed    : Emulation Directory.  The directory which contains the D3-3780.EXE
+        file.  If using DOS 2.XX the path must contain the emulation
+        directory for this value to be correct.  If using DOS 3.XX or 4.XX
+        the value will always be correct.
+
+ef    : Exit file.  This is then name of a command file which will be
+        automatically be executed when the package is exited.  If the string
+        contains a label instead then the configuration file will be
+        reloaded and execution will begin at the location of the label.
+
+ei    : Error Indicator.  This variable is the errorlevel of the most recent 
+        operation.  This value is reset on EVERY instruction (even comments).  
+        It is read only.
+
+el    : Error Line.  This variable is the line number of the most recent
+        operation that had a non-zero "ei" value.  The value remains until 
+        the next non-zero error "ei" value occurs.  It is read and write.
+
+ep    : Error Persist.  This variable is the errorlevel of the most recent 
+        operation that had a non-zero error indicator.  The value remains 
+        until the next non-zero error occurs.  It is read and write.
+
+eq    : Enquiry Limit.  The number of consecutive enquiries which must occur
+        before a send or receive will generate an error.  0 means try
+        forever.
+
+er    : Enquiries received.  The number of enquiries received in the last
+        reception.  Read only.
+
+es    : Enquiries sent.  The number of enquiries sent in the last 
+        transmission.  Read only.
+
+ex    : Exit string.  This is a direct video write string written out just
+        before the package exits.  Typically, it would be used to clear the
+        screen and place the cursor if the exit batch file is not setup to
+        do so.  This string is also written out prior to calling a DOS shell.
+
+ga    : Graph Attribute.  This is the video attribute byte for ASCII 
+        characters above 7F hex in video writes.  The attribute is 
+        generally used for boarders of boxes.  The "\21" escape sequence 
+        will also set the color to the Graph Attribute.  See sections 8.1 
+        and 8.3 for more on attribute variables.
+
+ge    : Graph Enable.  If this value is 7F hex then the characters numbered
+        above 7F are written out using the graph attribute if the value is
+        FF then the automatic setting of the graph attribute is disabled.
+
+ha    : High Attribute.  This is the attribute used to highlight the
+        sending or receiving file names and conversion types when they are
+        active.  It defaults to Light Blue in color and High intensity in
+        monochrome.  The "\20" escape sequence enables this attribute.  See 
+        sections 8.1 and 8.3 for more on attribute variables.
+
+i0-i9 : General purpose integers.  These are general purpose integers which
+        can be used for loop counters, mathematical operations, flags and
+        indices into arrays.
+
+id    : Idle Limit.  This value is the number of ticks (which occur 18.2
+        times a second) before a reception will be aborted.  0 means wait
+        forever.  It does not run while waiting for a reception to begin,
+        only once the reception has started.
+        Note: The timeout for the "W" command does not timeout once a 
+              reception has been started.  This value will cause an error
+              if activity halts during the reception.
+
+it    : Interrupt.  This is the modems interrupt level.  It should be one
+        of 2,3,4 or 5.
+
+ka    : Key Attribute.  This is the default attribute used for keyboard
+        input in the interactive mode.  Its default values are the same as 
+        the default attribute.  See sections 8.1 and 8.3 for more on 
+        attribute variables.
+
+kr    : Naks received in last reception. Read only.
+
+ks    : Naks sent in last transmission. Read only.
+
+lf    : List file.  String which is the name of the current listing file.
+        The name will be "NUL" if no listing file is being used.  String
+        type.  Read only (use the "lf" command to change it).
+
+mb    : Memory Branching.  This is a boolean value which sets the branching
+        type of the command file.  There are two branching techniques
+        supported in D3-3780.  One is slow but requires no additional memory
+        and the other is fast but requires some memory (if enough memory
+        cannot be obtained then the slow technique is always used).  If this
+        value is 1 (the default) the fast technique is used otherwise the
+        slow one is used.  The value must be set before the command file is
+        executed and applies to the original command file and any files
+        loaded using the "CALL" or "XB" commands.  You may want to set the
+        value to 0 if you have several very large buffers and are getting
+        the "Insufficient internal memory" error number 93.
+
+mv    : Modem Version.  The version number of the modem.
+        Version number in Hex  -  Modem
+         0 - Sync-Up 201C
+         1 - Sync-Up 208A/B
+         2 - Sync-Up 9600B
+         3 - Sync-Up 201/212
+         4 - Sync-Up V.26
+         5 - Sync-Up V.22 bis
+         6 - Sync-Up T9628
+         7 - Sync-Up 4824
+         8 - Sync-Up V.32
+        80 - Sync-Up 2/201
+        81 - Sync-Up 2/208/201
+        83 - Sync-Up 2/201/212
+        85 - Sync-Up 2/V.22 bis
+        86 - Sync-Up 2/T9628B
+        88 - Sync-Up 2/V.32
+        ff - if the version number is unavailable.
+
+n#    : Punch auto-naming index.  This is the number in the extension of the
+        punch file name (or 0 if no number).  The value is read only but the
+        "dn" command can be used to set the number.
+
+na    : Punch Auto-Naming value.  Scalar, 0 means disabled, 1 means enabled.  
+        The auto-naming option can be changed by modifying this value.
+
+nk    : No acknowledgment limit.  This is the maximum number of no
+        acknowledgments before a reception or transmission is aborted.
+        0 means there is no limit.
+
+nn    : String variable which points to the punch name.  This value can have
+        strings assigned to it which will affect the next reception.  The 
+        maximum length is 65 characters.
+
+ns    : Punch Standard buffer type.  Scalar,0-Vary,1-Fixed,2-Binary,3-Hex.
+        This variable is read and write.
+
+nt    : Punch Transparent buffer type.  Scalar,0-Vary,1-Fixed,2-Binary,3-Hex.
+        This variable is read and write.
+
+nu    : NULL pointer.  This is a dummy constant value which is used to
+        to indicate that a pointer does not point to anything.  There
+        are circumstances which this value should be assigned to a pointer.
+        Section 5.7 describes the way the "nu" variable should be used in
+        detail.
+
+p#    : Printer auto-naming index.  Same as "n#" above except for the 
+        printer.
+
+p0-p9 : Pointer variables.  These are used to point into the "db" buffer.
+        You can use the "db" buffer as if it were several smaller buffers
+        by pointing these into certain locations into it.  They are also
+        useful in many string operations.
+
+pa    : Printer Auto-naming value.  Same as "na" above.  
+
+pn    : Printer filename.  Same as "nn" above.
+
+ps    : Printer Standard buffer type.  Same as "ns" above.
+
+pt    : Printer Transparent buffer type.  Same as "nt" above.
+
+ra    : Reverse Attribute.  The attribute used for reverse video in direct
+        video writes.  It is activated by using the "\16" escape sequence.
+        See sections 8.1 and 8.3 for more on attribute variables.
+
+rl    : Receive Record length.  This value is used to set the implied record 
+        length of incoming data when the "Fixed" buffer type is used.
+
+rs    : Receive Size.  The size of the last reception.  Read only.
+
+rt    : Receive type.  Indicates the type of the last reception.  The
+        possible values are: 
+          0 None    ; No reception since boot up.
+          1 std-prn ; Last reception was in standard mode, to the printer.
+          2 std-pun ; Last reception was in standard mode, to the punch.
+          3 trn-prn ; Last reception was in transparent mode, to the printer.
+          4 trn-pun ; Last reception was in transparent mode, to the punch.
+        This value is read only.
+
+sc    : The direct video screen.  This is a pointer to the screen to be
+        displayed.  It is both read and write and can even be assigned new
+        pointer values.  Multiple screens can be loaded and this value can
+        be changed to point to different screens for display.
+
+sd    : Send Destination.  Scalar, 0-printer, 1-punch.  The variable is
+        both read and write.
+
+sm    : Send Mode.  Scalar 
+         0 Standard Mode,  Variable Record type
+         1 Standard Mode, Fixed Record type
+         2 Standard Mode, Binary Record type
+         3 Standard Mode, Hex Record type
+         4 Transparent Mode, Variable Record type
+         5 Transparent Mode, Fixed Record type
+         6 Transparent Mode, Binary Record type
+         7 Transparent Mode, Hex Record type
+        This variable is both read and write.
+
+sn    : Send name.  String type, Read only.
+
+sr    : Send Record Length.  The implied record length in a "Fixed" buffer
+        type send.  This is the number of blanks padded on the left for this
+        type.
+
+ss    : Send size.  The size of the last send.
+
+sv    : System variables.  This is a pointer to a ragged array containing all
+        the format strings for the display variables.  It is primarily
+        included so the '!' operator can be used for you to check the 
+        amount of memory your format strings are occupying.  This value is
+        a pointer and can be reassigned but this is not recommended.
+
+tb    : Trailing Blanks.  This determines if blanks at the end of a record
+        are transmitted when sending with the "Vary" buffer type.  If it is
+        0 then trailing blanks are not sent (like a real 3780) if it is a
+        1 then trailing blanks are sent.
+
+th    : Time-Hour.  The current hour.  Read Only.
+
+ti    : Timeout.  This is the time (in ticks, 18.2 tick per second) between 
+        re-enquiries when sending this value is typically set for 3 seconds
+        (or 54 ticks).
+
+tm    : Time-Minute.  The current Minute.  Read Only.
+
+ts    : Time-Second.  The current Second.  Read Only.
+
+ua    : Underline Attribute.  This is attribute defaults to underline in
+        monochrome mode and red in color mode.  The "\23" escape sequence
+        is used to enable it.  See sections 8.1 and 8.3 for more on 
+        attribute variables.
+
+va    : Version-Major.  The major number of the DOS version number.
+
+vb    : Version-Bisync.  The version of D3-3780 multiplied by a 1000.
+
+vi    : Version-Minor.  The minor number of the DOS version number.
+
+vm    : Video Mode.
+         2 -- Means Color card running in monochrome mode
+         3 -- Means Color
+         7 -- Means Monochrome
+        See section 8.2 for more on video modes.
+
+wa    : Window Attribute.  This is the default attribute used for writes in
+        the scrolling window.  It is gray in color and normal in monochrome.
+        See sections 8.1 and 8.3 for more on attribute variables.
+
+wb    : Window Bottom.  The bottom line of the scrolling window.
+
+wr    : Window Right.  The rightmost column of the scrolling window.
+
+wl    : Window Left.  The leftmost column of the scrolling window.
+
+wt    : Window Top.  The top line of the scrolling window.
+
+The following sections will describe how these variables can be used and the
+operations which can be performed on them.
+
+
+5.2 Constants
+
+Numeric constants are the normal numbers 0-9, numbers contained in "<>",
+hex numbers <hFF> and characters in single quotes 'A'.
+Examples:
+
+    <hff>        ; hexadecimal FF or decimal 255
+    'A'          ; The ASCII a character, hex 41 or decimal 65
+    89           ; Just like it looks, decimal 89
+    <-89>        ; Decimal -89 the "<>" symbols are only required for hex 
+                   numbers to make distinguishing the number from the 
+                   filename more direct.  More on this later.
+    <45>         ; Decimal 45, The "<>" symbols are not required but don't
+                   hurt anything either.
+
+Note: There is one place where <45> would be treated differently than 45.
+      This is in the destination field of a branching instruction.  See 
+      section 5.4 on labels for more on this.
+
+String constants are series' of characters enclosed in double quotes.
+Example:
+
+  "This is a dummy string"
+
+Note: Strings are terminated with a hex 0.  If this string were copied into
+      a buffer then a hex 0 would be copied to the location past the "g" to
+      indicate that the string was finished.
+
+String constants can contain certain escape sequences to allow the entering
+of special data.  The escape sequences begin with a backslash and are 
+followed by other characters to describe the desired operation. 
+
+These escape sequences are:
+
+  "\###"  -- Where "###" is any decimal number from 0-255.  This number
+             is entered directly into the string.
+  "\+###" -- The same as "\###" above.
+  "\-###" -- Similar to the above two except the number is negative.
+  "\x##"  -- Similar to above except the number is in hexadecimal.
+  "\a"    -- Same as "\7" (a bell in a video write).
+  "\b"    -- Same as "\8" (a backspace).
+  "\t"    -- Same as "\9" (a tab).
+  "\n"    -- Same as "\10" (a linefeed).
+  "\v"    -- Same as "\11" (Scrolls the screen in a video write).
+  "\f"    -- Same as "\12" (form feed, clears the screen in a video write).
+  "\r"    -- Same as "\13" (a carriage return).
+
+See section 8.4 for more on the video functions of these escape sequences.
+
+5.3 Special Symbols
+
+D3-3780 uses several special symbols to perform operations on and 
+distinguish variables.  Every reference to a variable must begin
+with one of these symbols in order to stop it from being interpreted as
+a filename.  The symbols are listed below.
+
+
+The variable indicator: % (percent sign) 
+
+Used to designate that this is an internal variable (not a filename).
+Whenever a variable is accessed in a normal fashion the "%" sign is
+used to distinguish the variable name from the equivalent filename.
+
+
+The Index indicators: [] (brackets)
+
+Used to index into buffer or pointer variables.  This is the same as many
+common languages use the bracket.  Arrays are indexed from 0 rather than 1.
+The value can be used on the db and p0-p9 variables and any other pointer
+variables.  Once a pointer is set to point to a location then it can be 
+indexed as if it were an array starting at that location.  The value inside 
+the brackets can be anything which evaluates to a scalar.  
+For example:
+
+Given
+db = 0 1 5 3 4 5 6 ...
+i0 = 0
+i1 = 5
+p0 points to db[3]
+
+%db[5]      ; The character at location 5 in the db buffer which is 5.
+%db[%i1]    ; Since the i1 integer is 5 then the same as above.
+%db[%db[2]] ; Since 5 is at db[2] then this is the same as %db[5] or 5.
+%db[%db[%p0[2]]] ; Since p0[0] is db[3] then p0[2] is db[5]=5 so this 
+                   is 5 also.
+
+The last two examples shows that the index can be another value with an 
+index.  There is no practical limit to the number of times indexes can have
+other indexes within them.
+
+
+The "address of indicator": & (ampersand) 
+
+"the address of" operator.  Used to indicate the address of a value
+rather than the value itself this is normally used in conjunction with
+the an indexed pointer.  
+For example:
+
+   mov %p0,&db[1000]
+
+This assigns the address of the character "db[1000]" to the pointer
+variable p0.  p0 could then be indexed like an array starting at db[1000]
+
+
+The "value pointer to by": @ (at sign)
+
+The value pointed to by a pointer variable.  For example:
+
+   mov %p0,&db[1000]
+   mov %i0,@p0
+
+If i0 would be set equal to the value at db[1000].  This value is 
+equivalent to indexing at zero (@p0 is the same as %p0[0]).  This is a
+useful shorthand notation since the first value is frequently needed.
+
+In batch mode, this symbol can also be used to precede a command name to 
+stop the command from being echoed to the screen.
+
+
+The "number indicator": # (pound sign)
+
+Used to convert a string (containing numbers) into the number itself.
+
+   cpy %p0,"789"
+   mov %i0,#p0
+
+The "cpy" command copies the string "789" to the location pointed to by
+p0.  Then the value 789 decimal is assigned to i0 since "#p0" evaluates
+to decimal 789.  The "#p0" could be used anywhere a numeric constant is
+needed, even as an index.
+
+
+The "make string symbol": $ (dollar sign)
+
+Used to turn an integer into a string.
+For Example:
+
+  mov %i0,67
+  cpy %p0,$i0
+
+This would cause the string "67" to be copied to the location pointed to by
+p0.  The "$" operator is supported on all pointer variables.  
+
+An internal string is created by this command with a limited lifetime.  
+Specifically, newer uses of the "$" sign operator may destroy the older 
+values.  The values are guaranteed to be valid within 10 uses of the "$" 
+operator.  After that the oldest value may be destroyed by the newest 
+value.
+
+For Example:
+
+  mov
+  mov %p0,$i0
+
+
+To convert another 
+variable either move it into an "i#" variable or use the "srite" function
+to be discussed later.
+
+
+The "size (length) of variable operator": !
+
+This will return the length of a variable or (more importantly) the length
+of the buffer which a pointer points to.  This is useful for diagnostics
+when memory overflow problems occur.
+
+In batch mode, this symbol can also be used to suppress all output from a 
+command including the echo of the command itself.
+
+
+The "make me a label or filename operator": ^ (carat)
+
+To cause any string to be interpreted as a filename or a label.  This is
+used when a string contains a filename of label.
+For example:
+
+  mov %p5,":out"
+  go,^%p5
+
+The "go" statement needs to see a label or line number.  If the carat were
+not there then it would look for a label called "%p5".
+
+
+The operator override: ] (closed bracket) 
+
+Used to start filenames which begin with a special symbol or number.  If a
+filename begins with one of the operators it can be forced to be viewed as
+a filename by putting a "]" in front of it.
+For example:
+
+ open 0,]89file.txt
+
+The second parameter would not be recognized as a filename unless the bracket
+preceded it.
+
+
+
+5.4 Labels
+
+Labels are used as the destination in batch branching instructions.  They
+begin in the first column of a line and must always begin with a ":".  There
+is currently no limit to how long you can make a label or how many labels are
+in a given file.  Regardless of how many characters you use D3-3780 checks 
+for a perfect match.  See section 6.1 on branch instruction for more 
+information on labels.
+
+
+5.5 "Scalar" and "Pointer" as used in this document.
+
+There are two basic types of variables used in the D3-3780 command
+language.  These are scalars and pointers.  
+
+Scalars are:
+
+          Description                          Examples
+-----------------------------------------------------------------
+Decimal and hexadecimal constants               89 <hFF>
+             Characters constants             'A' 'B' '0'
+                Integer variables              %i0 %i9 %bl
+      Members of character arrays           %db[5] %p0[3] %nn[8]
+       Pointers with the "@" sign              @p0 @p6 @p9
+       Pointers with the "#" sign                #p0 #db
+
+
+Pointers are:
+          Description                          Examples
+-----------------------------------------------------------------
+                String Constants         "a string" "golly wolly"
+    db and the pointer variables             p0 db nn pn p9
+             i0-i9 with "$" sign               $i0 $i8 $i2
+    indexed arrays with "&" sign           &db[5] &p0[7] &pn[8]
+
+The word "string" is used to refer to pointers which point to ASCII data
+which uses a 0 character to signify the end of the data.  The word "buffer"
+is used for pointers to any type of data that have some memory available at
+the location they point to.  Labels and filenames are stored internally as 
+strings but they are treated differently by most functions.
+
+
+5.6 Pointer Variable Fundamentals
+
+One of the more complicated parts of writing D3-3780 batch files is handling
+pointer variables and, in general, memory allocation.
+
+A pointer variable is a variable which can contain an address in the 
+computer's memory.  In D3-3780, most pointers variables are initially set to 
+an invalid value (some status pointers are set to point to specific things by
+default).  This invalid value is referred to as "NULL".  If you attempt to 
+write a null pointer "(null)" will be displayed.  If you try to copy data to 
+the location pointed to by a null pointer an error will result.
+
+Values are assigned to pointers in several of D3-3780's commands.  Some 
+commands tell D3-3780 to reserve some memory for the variable and change 
+the value of the pointer to "point" to the reserved memory (alloc, allst,
+getxt).  Other commands allow the pointer to be assigned a value that 
+points within memory that has already been allocated (stc, stst, mov).
+
+The "reall" adjusts the amount of memory which a pointer points to and the
+"free" function gives the memory back that was allocated (and sets the
+pointer to NULL).
+
+In D3-3780, when a pointer is assigned a value a length is also assigned
+(internally) which indicates how much memory is reserved at the location 
+the pointer points to.  This length is frequently used when a data is 
+transferred to or from the location the pointer points to (load, gbuf, 
+rdln, etc.).
+
+
+5.7 Common Pointer Errors
+
+There are several possible errors which can be made by incorrectly using
+pointers.  These errors may be difficult to detect since the error message
+frequently lags the actual error and may even result in occur sometime 
+later.
+
+Writing to a location that does not have memory allocated to it.
+
+  Example:
+
+    free %p0
+    cpy %p0,"A dummy string".
+
+  The p0 variable cannot have any memory allocated to it since the free
+  command gave it all back.  This will result in a NULL pointer assignment
+  error [77].  The same error will occur if the pointer is never assigned
+  a value (p0 is initially NULL).
+
+  A more subtle form of this error is when two pointers have been pointing
+  to the same area and one is used to free the memory.  The other pointer
+  will no longer be pointing to allocated memory but its value will not be
+  NULL.
+  Example:
+
+    allst %p0,"This will allocate some memory to the %p0 variable"
+    mov %p1,%p0
+    free %p0
+    cpy %p1,"This is an error but no message will be displayed"
+
+  The problem with this code is that the "free" gave all the memory back to
+  the system but the second pointer "p1" continues to use the memory.  This
+  error will not result in an immediate error but may cause trouble later on.
+  It is a good practice to set invalid pointers to NULL.  This is accomplished
+  by using the "nu" variable.  
+  Example:
+
+    allst %p0,"This will allocate some memory to the %p0 variable"
+    mov %p1,%p0
+    free %p0
+    mov %p1,%nu
+    allst %p1,"This is an no longer an error"
+
+Writing to a read only variable via a pointer variable.
+  Another possible error is to write to a read only variable by first assigning
+  a pointer to the read only variable.  An error message will be displayed if
+  you try to assign to a read only variable directly but no error will be
+  generated if a pointer variable is used to do it.  
+  Example:
+
+    mov %p0,%ed
+    cpy %p0,"garbage.dir"
+
+  This would destroy the emulation directory (which can stop the cleanup 
+  section of the configuration file from executing properly).    
+
+Failing to free unused memory
+  When memory has served its purpose it should be freed using the "free" 
+  command or by allocating it for another purpose (the alloc and allst 
+  automatically free a non-NULL pointer if it is passed to them).
+  Example:
+
+    alloc %p0,400
+    srite %p0,"/copy "+%p1+" "+%p2
+    intrp %p0
+    mov %p0,%nu
+
+  The first command created a temporary buffer.  The second command assigned a 
+  value to the buffer and the third used the value in the buffer.  The fourth
+  command destroyed the only pointer to the allocated memory without first
+  giving the memory back to the system.  This is a waste of 400 bytes of 
+  memory.
+  Correct Examples:
+  
+    alloc %p0,400
+    srite %p0,"/copy "+%p1+" "+%p2
+    intrp %p0
+    free %p0
+
+    or
+
+    alloc %p0,400
+    srite %p0,"/copy "+%p1+" "+%p2
+    intrp %p0
+    allst %p0,"Some string which will be useful later"
+
+  Both of these examples give memory back when they are through with it.  The
+  first example does this by using a free command (this command also assigns
+  NULL to the pointer).  The second uses the pointer as the argument to the
+  allst command.  This command will automatically free the memory pointed to
+  by a pointer if the pointer value is not NULL.  The alloc command will also
+  free non-NULL pointers.
+  
+Freeing a pointer which was never alloced
+  This error occurs when a non-NULL pointer whose value is was not assigned
+  with an alloc, allst or reall is used as an argument to a free, allst or 
+  alloc command.  
+  Example:
+
+    allst %p0,"Never eat raw vegetables."
+    mov %p1,&p0[6]
+    rite %p1
+    allst %p1,"This is a subtle error."
+
+  The last statement inadvertently causes the value of p1 to be freed (since
+  p1 is not NULL but it does not point to an allocated memory block).  This
+  is corrected as such:
+  
+    allst %p0,"Never eat raw vegetables."
+    mov %p1,&p0[6]
+    rite %p1
+    mov %p1,%nu
+    allst %p1,"This is no longer an error."
+
+  The assignment of NULL to p1 stops the allst command from assuming that p1
+  points to an allocated memory block.
+
+I may add some more run time checking to correct or point generate errors for
+some of these conditions (especially the last one).  
+
+
+5.8 Suppressing Video Output using '@' and '!'
+
+Several techniques and commands are offered to suppress the different kinds of 
+video writes.  The two symbols '@' and '!' can be used immediately before a 
+command to perform a very short suppression of video.  The '@' symbol is used
+to stop the command itself from being echoed to the screen.  The '!' stops the
+command and any of its writes from being echoed (except for the rite command).
+
+Examples:
+
+  @sup
+  * The sup command will not be displayed.
+
+  !dl "1 (205) 881-8183"
+  * The dl command and all status messages from the "dl" will be suppressed.
+
+A variety of other commands exist to suppress video for a set of lines but
+these two are useful when you merely want to suppress the output in a few
+specific instances.
+
+
+5.9 Booting D3-3780 in batch mode
+
+There area two ways of having a command file execute automatically on boot
+up (rather than going interactive).  
+
+By specifying the "-F" parameter on the DOS command line.
+Example:
+       C>d3-3780 -fcmdfile.cmd
+	  C>d3-3780 -f
+
+In the first example the file "cmdfile.cmd" would execute and in the second
+example the file "D3-3780.CMD" (the default name) would execute.  The program
+would return to DOS when the command file is through executing.  
+
+The other way is by specifying the "F" parameter in the configuration file.
+If the following line is included in the "D3-3780.CFG" file the command file 
+"D3-3780.CMD" will execute:
+
+  mov %dp,'F'
+
+The dp (Dash Parameter) variable is expressly designed for this purpose.  This
+assignment is only significant in the configuration file.  The command file
+which is executed can be set in the configuration file also:
+
+  mov %dp,'F'
+  cpy %cf,"cmdfile.cmd"
+
+The command file "cmdfile.cmd" in the active directory would be executed 
+in this case.  The command file name can include a path and can be up to 65
+characters long.  The following would execute the command file in the 
+emulation directory:
+
+  mov %dp,'F'
+  srite %cf,%ed+"\cmdfile.cmd"
+
+The srite will command the ed (emulation directory) plus the command file name
+to the command file variable in this case.  Assigning a value to the cf 
+variable is only relevant in the configuration file.
+
+The default names ("D3-3780.CMD" and "D3-3780.CFG") can be changed to other
+values.  See chapter 9 for a discussion of how to change these names.
+
+  

@@ -1,0 +1,604 @@
+6.0 Command Summary by Class
+
+This section lists all the commands and has some fundamentals about how and
+when they should be used.  The following sections have in depth descriptions
+of some of these classes of commands.  Chapter 7 has in depth descriptions
+of every command.
+
+
+Branching Control Commands
+--------------------------
+These commands affect the the logical flow of the command files.  Section
+6.1 discusses this class of command in detail.  The commands:
+
+call   clrca   end     go      if      ife     ifef    ifi     ifo     ifp     
+ifs    ift     il      on      ret     xb
+
+
+Quick and Dirty File Commands
+-----------------------------
+These commands allow some simple file manipulation.  Section 6.2 discusses
+these commands in more detail.  The commands:
+
+app    load    save
+
+
+File Commands using handles
+---------------------------
+These commands allow some extensive file manipulation.  Section 6.2 discusses
+these commands in more detail.  The commands:
+
+astat  clall   close   frite   fstat   gbuf    open    pbuf    rdln    read
+seek   tell
+
+
+Other File Commands
+-------------------
+These commands are copies of standard DOS commands.  Section 6.2 discusses
+file commands.  The commands:
+
+del    dir     er      ld      size    ren
+
+
+Communications Buffering Commands
+---------------------------------
+These commands are used to save incoming data so that it can be easily 
+manipulated within the command language.  The individual descriptions
+of these commands in section 7.0 provide more detail.
+
+bdn    bdp     buf
+
+
+String Processing Commands
+--------------------------
+These commands provide a variety of string and memory manipulation features.
+Sections 6.4, 6.5 and 6.6 provide more detail as to their operation.
+
+allst  cat     cpy     lwr     setbf   slen    sptr    srite   stc     stst    
+upr
+
+
+Connection Control Commands
+---------------------------
+These commands are used to establish and break connections with a host or 
+another PC.
+
+aa     c       dl      ds      kl      m
+
+
+Modem Diagnostic Commands
+-------------------------
+These commands are used to test and determine the type of modem in the PC.
+The are primarily used if the modem or its configuration is suspect.
+
+mo     mome    mv      
+
+
+General Diagnostic Commands
+---------------------------
+These commands provide diagnostic capabilities for debugging command files,
+determining what is occurring on the line and storing logs of information to
+disk.
+
+astat  dt      lf      ss      st      svals   td      tr      vals
+
+
+General Commands
+----------------
+?      *       comp    da      help    intrp   p       redir   rstrt   tk      
+uncmp  w
+
+
+DOS Call commands
+-----------------
+These commands allow the D3-3780 command files to call DOS and execute batch
+and/or executable programs.  See section 6.3 for more information on these
+commands.
+
+>      .       /
+
+
+Sending Commands
+----------------
+These commands send information to the remote computer and sometimes request
+information back from the remote.
+
+rem    s       ss      svals
+
+
+Receive Control Commands
+------------------------
+These commands control the file names and buffer conversions used for files
+received.
+
+dn      dp     w 
+
+
+Screen Control Commands
+-----------------------
+These commands control the appearance of D3-3780.  More information on how
+these commands can be used to control the screen is provided in sections
+6.7 and chapter 8.
+
+cls    drite   dsup    getxt   key     lscrn   lstvs   putxt   redsp   rite    
+stoff  ston    sup     undsp   unsup   vtype
+
+
+Number Manipulation Commands
+----------------------------
+These commands are used to perform numeric calculations and assignment on
+integer, character and pointer variables.
+
+dec    inc     mov     opr
+
+
+Program Termination Commands
+----------------------------
+These commands terminate the command file and/or D3-3780.
+
+enz    end     ex      fq      q       qnz
+
+
+Memory Allocation Commands
+--------------------------
+These commands allocate memory, free previously allocated memory and/or
+adjust the size of previously allocated memory.  Section 6.5 discusses these
+commands in detail.
+
+alloc  allst   free    reall
+
+
+System Initialization Commands
+-----------------------------
+These commands are used to set up and modify the system's configuration.
+Chapters 7 and 9 have detailed descriptions of these commands and their
+usage.
+
+lscrn  lstvs   mseth   sdefs   setpr   sform   smask   smax    so      sptyp
+tabls  vtype
+
+
+6.1 Branching Control Commands
+
+The branching commands are commands which cause a batch file to resume 
+execution at another line in the file.  The destination of branch can be
+a label, absolute line number, relative line number or a D3-3780 command.
+
+If the destination is a label then execution will begin at the line following 
+the label.  All labels must begin with a colon ":".  
+
+If the destination is a number and is not placed in "<>" symbols then it is
+assumed to be an absolute line number.  If the number is placed within the
+"<>" symbols then the number is added to the current line number and execution
+will continue there.  The number can be negative if placed within the "<>" 
+symbols (thus branching up that number of lines).
+
+If a quoted string is included in the destination field then the string is 
+assumed to be a D3-3780 command.  The command will be executed and (unless the
+command is another branch command) execution will continue on the following
+line.
+
+If a destination field is left blank (two consecutive commas or no "=" sign
+in an "on" command) then execution will continue on the next line as if no 
+branch command had been encountered.
+
+The "on" command is used to branch to different locations depending on the
+value of a variable.  The following example demonstrates all four types of
+branch destinations (the values to the immediate right of the "=" signs are 
+destinations).
+
+Example:
+Line  Data
+1.    * The "*" that starts this line makes it a comment.
+2.
+3.    * The "dl" command below will set the ei variable
+4.    dl "1-(205)-881-8183"
+5.    on %ei,0=:lbl,1="ex",2=<-2>,4=3
+6.
+7.    * If ei is 0 then execution will begin at label
+8.    :lbl
+9.    * This is the line which will execute if dl is successful.  
+
+If the value of ei is 0 then execution will continue on the line follwing the 
+label ":lbl" (in this case line 9).  If ei=1 then the command "ex" will be 
+executed to leave D3-3780.  If ei=2 then execution will continue on line 
+(6-2)=4 which contains the "dl" command.  Notice that the line the line counter
+is equal to the line after the current line (6 rather than 5).  This means that 
+a "-2" is required to go to one line backward.  if ei=4 then execution will 
+begin at line 3.  Otherwise execution will continue at line 6 as if no branch
+had occured.
+
+An option which is significant to operation of the branching commands has to do
+with the mb variable.  This variable determines if the branch locations will be
+determined by a table in memory or whether the file will be searched for the 
+appropriate value.  The memory table executes much faster but requires a fair 
+amount of ram.  This variable defaults to 1 which means memory branching.  If 
+the value is set to 0 then branches will be performed by performing file 
+searches.  The value applies to the initial command file and any files loaded 
+using the "XB" or "CALL" commands (the configuration file never uses memory 
+branching).  If you are using some large buffers in your command file and get
+the "Insufficient internal memory" error (number 93).  Then you may want to set
+the value of mb to zero in the configuration file.
+
+If there is insufficient internal memory to perform memory branching then file
+based branching will automatically be used.
+
+
+6.2  File Commands 
+
+Section 6,0 lists three classes of file functions: "Quick and Dirty", 
+"Commands using Handles" and the "Other file commands".  
+
+We'll start with "Commands using Handles".  The first parameter in these 
+commands is a number which is associated with the a specific file.  This 
+number is referred to as a "File Handle".  The allowed file handles are 0 
+through 9.  Before any of the handle based file operations can be used the
+file must be "open"ed to associate the file with the handle (that is the sole
+purpose of the "open" command).  This command creates a file if the file 
+doesn't already exist or opens the file for read only if it does exist 
+(this can be changed using an options parameter).  When you are through 
+processing a file the "close" command is used to free up the desired handle.
+
+There is an implied location in the "handle" based commands at which reads and
+writes occur.  This location is referred to as the file pointer.  The "seek"
+command is used to explicitly move the location of the file pointer and the
+"tell" is used to read the location of the file pointer.  The file pointer is
+advanced whenever a read or write is performed on the file.  In this way,
+successive reads will continue to read through the file from beginning to end
+and successive writes will continue to append data to an open file.
+
+The quick and dirty file commands save you the trouble of having to open, 
+close, etc. files.  These commands need only the file's name as a parameter.
+The main drawback of the quick and dirty commands is that they can only work
+on a buffer full of data at one time.  For example, there is no way to read
+a part of a file which is farther in the file than the size of your buffer.
+However, many operations can be done simply by using these commands.
+
+The other file commands are essentially DOS replacements that stop you from
+constantly having to shell to DOS.  There are also some alias command names
+("er" for del and "ld" for dir) which are included for compatibility with the
+Bsc command language.
+
+
+6.3 DOS Call commands
+
+The DOS call commands allow D3-3780 command files to call a other programs,
+batch files and built in DOS commands (such as "copy").  
+
+The ">" and "." are useful only when running interactive since they require
+a key to be pressed before returning to DOS.  The "/" is useful even as a 
+remote command or when the DOS command does not display useful information.
+
+There are several possible problems when calling another program however:
+
+  The DOS program may destroy the screen.
+    Since a DOS program is not aware what D3-3780 may have displayed it is 
+    likely to write over valid parts of the screen.  The "redsp" command
+    can be used to regenerate the direct screen after running the DOS command.  
+    Also, the output of many DOS programs can be redirected to a file.  The 
+    contents of the file can then be written to the screen using D3-3780's 
+    video writes.
+    
+  There may not be sufficient far memory to run the program.
+    If there is not enough memory to run the program then there is little that
+    can be done in D3-3780.  The only things are to get rid of excess memory
+    resident programs.
+     
+  When running unattended the DOS Program may expect user interaction.
+    If the DOS shell is loaded as a remote command on an unattended PC (see 
+    the "rem" command) then the remote will "hang up" waiting for keyboard 
+    input.  If a program can accept redirection then the input to the remote
+    program can come from a file.  Otherwise, the program cannot be run on
+    unattended remotes. 
+  
+  The program called may be so time consuming that messages are missed.
+    If a program takes a large amount of time at run time then D3-3780 may
+    miss activity on the line.  Fortunately, it takes from 10-30 seconds for
+    a communication to fail and then it can be retried until successful.
+     
+Despite these possible problems the DOS shell command is a very powerful 
+command.  It is especially useful when running a remote unattended.  See the
+description of the "rem" command in chapter 7 for more information on these
+features.
+
+  
+6.4 Data Copying Commands (determination of buffer length)
+
+The data copying commands take data from one location (or file) and store it at
+another location (or file).  The locations in memory are referred to using
+pointer variables.  The commands use similar techniques to determine the length
+of their arguments.  The commands which this refers to are:
+
+Source Lengths:
+app	pbuf	save
+
+Destination Lengths:
+bdn	bdp	buf	cat	cpy	gbuf	load	rdln	setbf  
+
+There are five ways in which the length of the buffer may be determined: 
+
+  1. For string operations by copying until a hex 0 is reached. 
+	  If manipulating strings, then the first actual "0" (not an ASCII 0 but
+	  the actual number 0) will indicate the length of the source.
+
+  2. Limited length of source data.  If the source data is of limited size then
+	  it is common for the buffer to be larger than the size of the data 
+	  being copied.
+
+  3. By passing a length. 
+	  This value is merely a positive integer indicating how many bytes 
+	  to use at the location pointed to.  If it is larger than the amount 
+	  of space allocated at the location then an error will be generated.  
+
+  4. By passing a pointer to the first location NOT to be overwritten. 
+       If a buffer created with a single "alloc" command is being used for 
+	  more than one thing and the first part of the buffer is being used for
+	  the desired operation then the pointer to the second buffer can be 
+	  passed.  This will assure that the memory at and beyond the second 
+	  value is protected.  If the 
+	  
+  5. By using the built in length value for the value.  Pointer variables 
+	  carry around an internal variable which indicates the number of bytes
+	  to the end of the buffer they point to.  This is generally the default
+	  value if the length parameter is left blank.
+
+
+Some commands use the hex 0 in the file detected in the source to stop the 
+transfer and others do not.  Refer to the individual command descriptions to
+determine if the command treats a 0 specially.  The explanation of the "app"
+command in chapter 7 has examples of several of these length specifications
+being used.
+
+
+6.5 Memory Allocation Commands
+
+These commands control the dynamic allocation of memory.  Sections 5.6 and 5.7
+have a great deal of relevant information concerning the use of the pointers
+with these commands.  There are a couple of points I want to emphasize here:
+
+  1. The "alloc", "allst" and "reall" commands set the length value associated
+	with the pointers which are passed to them as arguments.  This value will
+	be used by most data movement commands.
+
+  2.	The "alloc" and "allst" commands will automatically free any non-NULL 
+     pointers that are passed to them.  If you keep reusing the same pointer
+	then an intervening "free" command is not required.  However, if a pointer
+     is non-NULL but does not point to dynamically allocated memory then it 
+	should be set to NULL before using it as an argument to one of these 
+	commands.
+	
+
+The individual descriptions of these commands in chapter 7 will supply more
+detailed descriptions of them.
+
+
+6.6 Other pointer assignment commands
+
+Three commands can be used to assign values to pointer variables that to not
+allocate memory at the same time:
+
+mov	stc	stst    
+
+When these assignments are made then the length values associated with these
+pointers must also be set.  In all cases the length value will be set to
+indicate the number of bytes from the location that the pointer points to and
+the end of the allocated buffer into which it points.  For example:
+
+  alloc %p0,500
+  mov %p1,&p0[100]
+
+The length of p1 will be 400=500-100.  In this way the end of the buffer will
+not be overwritten in the data movement commands.
+
+
+6.7 Screen Control Commands
+
+The screen control commands are covered in extreme detail in chapter 8.  Here
+we will discuss some of the fundamentals.  The next section will explain the
+"rite" command and give examples.  
+
+In the D3-3780 package there are fundamentally two different kinds of screen
+writes: Serial and Direct.  The Serial writes take place in a window which
+scrolls upward as more information is written.  This window contains the
+flashing cursor and video writes always begin at the cursor.  The cursor will
+remain at the line following a serial write.  Direct writes can be written 
+anywhere on the screen without regard to the cursor and do not (normally) 
+affect the cursor.  The words "serial" and "direct" will be used frequently in
+the following descriptions.  The commands affect the different kinds of writes
+as such:
+
+	Commands which affect Serial Writes Only:
+	cls		key		rite		sup		unsup   
+
+	Commands which affect Direct Writes Only:
+	lscrn	lstvs	drite	stoff	ston		dsup		undsp 
+
+	Commands which affect both Serial and Direct Writes:
+	redsp	getxt	putxt	vtype
+
+Generally, the serial writes are the simplest but least powerful tools to the
+command file programmer.  If you merely want to throw up some messages to
+inform the user what is going on then the serial writes are the way to go.  If
+you are wanting to give the package a different look (possibly to match an
+application) then the direct writes will be very important to you.  See chapter
+8 for more on direct writes.  The following section (6.8) and the command
+summaries in chapter 7 supply all that is necessary to use the serial writes
+effectively.
+
+
+Several of the video commands are complementary in that one command
+"undoes" the other command.  These commands are:
+
+sup		<-->		unsup     (Suppress/Un-Suppress serial writes)
+stoff	<-->		ston      (Suppress/Un-Suppress status variable updates)
+dsup		<-->		undsp	(Suppress/Un-Suppress direct writes)
+getxt	<-->		putxt	(Save/Restore a window on the screen)
+
+
+
+6.8 Format options for writing strings out
+
+The D3-3780 command language has several commands that allow you to write
+strings and numbers out.  These are:
+
+rite        ; For writing to the screen
+frite       ; For writing to a file
+srite       ; For writing to a buffer
+
+These three functions all have a similar syntax in that they all will accept
+multiple parameters which can be any combination of scalars and pointers.
+I'll use the "rite" function for the examples (since you can immediately
+see the results of your command).
+
+The basic syntax of the rite function is:
+
+rite val[;ops][+val[;ops]][+val[;ops]]...
+
+or (with brackets removed)
+
+rite val;ops+val;ops+...
+
+The val is any scalar or pointer and the ops consist of a string (not 
+necessarily quoted) that modifies the way the val is output.
+
+Lets start with some simple examples (remember that the "?" is a prompt):
+
+Writing a string
+
+  ?rite "This will be written to the screen"
+  This will be written to the screen
+
+Writing a string variable
+
+  ?cpy %db,"This will also will be written to the screen"
+  ?rite %db
+  This will also will be written to the screen
+
+Writing a scalar
+
+  ?mov %i0,89
+  ?rite %i0
+  89
+
+Writing a combination of strings and scalars
+
+  ?rite "The number "+<h40>+" is 40 hex"    
+  The number 64 is 40 hex
+
+The last example demonstrates how values can be concatenated.  Now, lets go
+over some of the formatting options.  The formatting options is a string
+that has combinations of letters and numbers to precisely control the
+output.  Unlike most strings, the quotes surrounding it can (normally) be 
+left off.  The general form of the options is:
+
+         [flags][width][.precision]type
+
+Each field of the string is a single character or number signifying a 
+particular format option.  The following describes each field.
+
+Type: The 'type' character determines whether the associated argument is 
+      interpreted as a character, string, or integer.  The simplest format 
+      string contains only 'type' character.  
+      
+         D or I  Scalar     Signed decimal integer (scalar default)
+         U       Scalar     Unsigned decimal integer
+         O       Scalar     Unsigned octal integer
+         X       Scalar     Unsigned hexadecimal integer
+         C       Scalar     Single character
+         S       Pointer    Only way to print a string (pointer default)
+
+Examples:
+
+?rite "The number "+64;d+" is "+64;x+" hex"
+The number 64 is 40 hex
+
+?rite "The signed number "+<-34>;d+" is "+<-34>;u+" in two's complement"
+The signed number -34 is 65502 in two's complement
+
+?rite "The number "+'A';d+" is an ASCII '"+65;c+"'"
+The number 65 is an ASCII 'A'
+
+
+Flags: An optional sequence of flag characters controls the justification of 
+       output and printing of signs and blanks.  
+       The flag characters available are:
+
+   Flag                Action                           Default
+   컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴�
+    �          Left justify the result within        Right justify
+               the field width.
+
+    +          Prefix the output value with a        Sign appears only
+               + or � sign if it is of a signed      for negative
+               type.                                 signed values(�)
+
+    blank      Prefix the output value with a        No blank
+               blank (ASCII 32) if the output
+               values is signed and positive;
+               the "+" flag overrides the blank
+               flag, and a positive signed value
+               will be output with a sign.
+
+If the "+" or blank is used then the options string must be enclosed in 
+double quotes (") characters to stop those signs from being interpreted as 
+parameter separators.  Both these options are useful for lining up columns 
+of numbers.  More than one flag can be included in the option list.
+
+Example Using Flags (more examples using flags will be with width info):
+
+?rite "This value will always be prefixed with a sign "+90;"+d"
+This value will always be prefixed with a sign +90
+
+
+Width: The optional width specifier is a decimal integer specifying 
+       the minimum number of characters to print, padding with blanks 
+       and zeros.  Width never causes a value to be truncated.
+
+Examples using Width:
+
+?rite "Wide number padded with zeros "+90;08d
+Wide number padded with zeros 00000090
+
+?rite "Wide number padded with blanks "+90;8d
+Wide number padded with blanks       90
+
+?rite "Wide number padded with blanks "+90;-8d+" left justified"
+Wide number padded with blanks 90       left justified
+
+
+Precision: An optional precision specifier is a decimal integer preceded by 
+           a period (.) which specifies the maximum number of characters 
+           printed for all or part of an output field.  It is identical to
+           width for numeric output (D,I,U,O,X) but is used in strings to
+           limit the length of strings which are output.  This is useful
+           when limiting the size of a string.
+
+Examples:
+
+?cpy %db,"This is a really long string which can cause the line to overflow"
+?rite "Only 5 characters will be putout '"+%db;.5s+"' ..see"
+Only 5 characters will be putout 'This ' ..see
+
+?rite "The parameter has no effect if the string is small, "+"see";.8s+" none"
+The parameter has no effect if the string is small, see none
+
+Their is one more option which does not fit among these.  An "R" can be put
+anywhere in the option string to cause a carriage return after the parameter
+has been printed.  As many R's can be included as you want carriage returns.
+
+Examples using R:
+
+?rite "This will be on one line";rs+"This will be on another"
+This will be on one line
+This will be on another
+
+?rite "Two returns here";rsr+90;0r8d+"the R's can be anywhere"
+Two returns here
+
+00000090
+the R's can be anywhere
+
+That completes the explanation of formatting options.  They're a bit 
+complicated but they are pretty flexible.
+
+

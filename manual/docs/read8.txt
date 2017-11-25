@@ -1,0 +1,967 @@
+8.0 Screen Customization Fundamentals
+
+The following sections are for those want to perform extensive modification 
+to the appearance of the D3-3780 package.  There are a variety of commands 
+and variables which allow this.
+
+In the D3-3780 package there are fundamentally two different kinds of screen
+writes: Serial and Direct.  The Serial writes take place in a window which
+scrolls upward as more information is written.  This window contains the
+flashing cursor and video writes always begin at the cursor.  The cursor will
+remain at the line following a serial write.  Direct writes can be written 
+anywhere on the screen without regard to the cursor and do not (normally) 
+affect the cursor.  The words "serial" and "direct" will be used frequently
+in the following descriptions.
+
+
+8.1 Video Attributes
+
+For each character on the video screen there is a byte which determines the
+color and other characteristics of how it is displayed.  This byte is
+referred to as an attribute byte.  Attribute bytes are bit-mapped in that
+different bits of the attribute have specific meanings.  The Bit definitions
+of the attribute bytes are:
+
+   Bit 7 (Most significant bit) Flashing (0 - normal, 1 - character flashes)
+
+   Bit 6 Background Red
+   Bit 5 Background Green
+   Bit 4 Background Blue
+
+   Bit 3 Intensity                    (0 - Low intensity, 1 - High intensity)
+
+   Bit 2 Foreground Red
+   Bit 1 Foreground Green
+   Bit 0 Foreground Blue
+
+ In color modes bits 4-6 bits combine to generate 8 distinct background
+ colors.  Bits 0-3 are used to generate 16 unique foreground colors.
+ The first eight foreground colors look the same as the 8 background colors
+ (the characters aren't visible if the background and foreground colors
+ match).  The last 8 foreground colors are merely brighter versions of the 
+ first eight colors.  These colors are:
+
+   0 - Black
+   1 - Blue
+   2 - Green
+   3 - Cyan
+   4 - Red
+   5 - Violet
+   6 - Brown (or Yellow if in foreground with intensity is set)
+   7 - White
+
+ If the system is on a monochrome monitor then the following meanings
+ apply:
+
+   Flashing bit determines flashing (same as on color)
+   Background, 7 is lit with low intensity all others are black
+   Intensity bit determines intensity (same as on color)
+   Foreground, 0 is black, 1 is underlined, all others look normal
+
+ Sometimes a user is running a monochrome monitor on a color display card
+ (this is especially common in portables).  This is functionally similar 
+ to monochrome except that the underline cannot be supported.
+
+
+8.2 Video Modes
+
+The Basic Input/Output System of a PC (really, the video adapter) has a
+variety of video modes.  Currently, D3-3780 supports three video modes
+directly (other modes can easily be added if desired, these modes however
+are the most common).
+
+  Mode 2: Color adapter in monochrome mode.
+  Mode 3: Color adapter in color mode.
+  Mode 7: Monochrome adapter (only has one mode).
+
+All three of these modes are 25 rows by 80 columns.  The default video
+attributes are set according to which mode the adapter is found in.  If
+the package is booted while the system is in another mode then it is
+switched into mode 3 (this always works since monochrome monitors have
+to be in mode 7 and all color cards support mode 3).
+
+When a user is running a monochrome monitor on a color adapter, mode 2 may
+look better than mode 3.  This depends on how well the monochrome monitor
+can display color using intensity.  If a user complains of an illegible screen
+then it may be desirable to use DOS' mode command to switch to mode 2.
+
+Mode Commands:
+
+ A>mode bw80          -- Sets mode to 2
+ A>mode co80          -- Sets mode to 3
+ A>mode mono          -- Sets mode to 7 (relevant in two monitor system only)
+
+The "VM" variable can be accessed in the command language to determine the
+video mode.
+
+
+8.3 Attribute variables
+
+Variables which can be changed in the command language are used heavily to
+determine the colors used in video writes.  Certain characteristics tend to
+be tied to certain attribute variables.  Changing one of these variables can 
+a dramatic effect on the appearance of the package (especially on color 
+monitors).  For example, changing the value of the Graph Attribute will 
+change the color of all the graphic character (often used for borders) on t
+he screen.  
+
+The names of these variables are: 
+
+  CA - Change Attribute
+  DA - Default Attribute 
+  GA - Graph Attribute
+  HA - High Attribute
+  KA - Key Attribute
+  RA - Reverse Attribute
+  UA - Underline Attribute
+  WA - Window Attribute
+
+  The Change attribute is generally used to the distinguish the changing
+    parts of the screen from the parts which do not change.  The distinction
+    is only made on color monitors.  The default is White on color monitors
+    and normal (low intensity) on monochrome monitors.  I've generally used 
+    this attribute for displaying the values of options and status 
+    information in the direct writes.  The implied meaning could easily be 
+    changed.
+
+  The Default attribute is used in a write until the color is explicitly
+    set using an escape sequence (see the next section).  It defaults to 
+    bright yellow on color monitors and normal on monochrome monitors.
+
+  The Graph attribute is automatically used for any character which is 
+    above 127 decimal (hex 7F).  This is used to make the borders of 
+    boxes a different color than the text.  The "16" decimal (hex 10)
+    escape sequence can be used to toggle the automatic use of this
+    attribute.
+
+  The High attribute is used to highlight the filenames and buffer types 
+    of the printer or punch when files are received.  When files are sent 
+    the attribute is used for the send filename.  It appears as Light
+    Blue on a color screen and High Intensity on monochrome.
+
+  The Key attribute is the default attribute in interactive mode for the
+    keys that are being pressed (at the command "?" prompt).  Its default
+    values are the same as the default attribute.
+
+  The Reverse attribute defaults to black letters on lighted background on 
+    a monochrome screen, black on green on a color screen.  It is not used 
+    for any particular class of operation.
+
+  The Underline attribute defaults to underline on a monochrome screen and
+    red on a color screen.  It is not used for any particular class of
+    operation.
+
+  The Window attribute is the default attribute for all writes in the 
+    scrolling window of the screen except a command being edited in 
+    interactive mode.  Its default value is normal (low intensity, gray 
+    on color monitors).
+
+The next section has a description of a large number of video escape 
+sequences.  Several of the escape sequences deal with the setting of the 
+attributes for video writes and use these variables to determine the
+new attribute value.
+
+
+See section 5.1 for information on built in variables.
+
+
+8.4 Video Escape Sequences
+
+Video escape sequences can be used in either the direct or serial writes. 
+The row,column values for the serial writes however are with respect to
+the current window while the row,column values for the direct writes are
+with respect to the entire screen.  Which functions use direct and which 
+are serial will be discussed later.
+
+The video writes have a number of special escape sequences which allow 
+you to change the colors and where the following characters will be 
+written.  
+
+The terms "row" and "column" are used throughout the descriptions.  Row 1 
+is the highest row and column 1 is the leftmost column.  In direct writes, 
+the rows are always numbered from 1 to 25 and the columns from 1 to 80.
+In serial writes, rows are defined relative to window variables (wt,wl,wr 
+and wb for top, left, right and bottom).  The allowed range for serial 
+rites is 26-wt for rows and 81-wl for columns.  
+
+The term "location" refers to the row and column which the next character
+will be written.  This can be thought of as the cursor location (although
+the actual flashing cursor is not necessarily moved with these video 
+writes).
+
+Video Escape Sequences (brief descriptions, long ones will follow):
+dec hex
+ 1  01 row col -- Relative goto. Write continues at:(row+old row,col+old col)
+ 2  02 row col -- Absolute goto. Write continues at:(row,col)  
+ 3  03         -- Put Flashing cursor at current (row,col) when done writing.
+ 4  04         -- Switch to minimum escape set (07,08,09,0A and 0D)
+ 5  05         -- Take next byte literally.  Allows writing of escape chars.
+ 6  06         -- Take rest of string literally (disables all escape chars).
+ 7  07         -- Audible Bell
+ 8  08         -- Backspace (Same as a relative move back one space)
+ 9  09         -- Tab (default stops are set at 1,11,21,31,...)
+10  0A         -- Linefeed
+11  0B ##      -- Scroll Window "##" lines (Scrolls backward if negative)
+12  0C         -- Clear video window (full screen for direct writes)
+13  0D         -- Carriage Return
+14  0E         -- Toggle Flash Bit of attribute
+15  0F         -- Toggle Intensity Bit of attribute
+16  10         -- Toggle automatic use of graph attribute
+17  11 ??      -- Change attribute byte to "??"
+18  12         -- Return to default attribute (either DA or WA variables)
+19  13         -- Change Attribute (White on color screens, normal on mono)
+20  14         -- High Attribute (Light Blue on color, High intensity mono)
+21  15         -- Graph Attribute (also used for chars above 127 decimal)
+22  16         -- Reverse Attribute (Black on Green in color, white in mono)
+23  17         -- Underline Attribute (Underline on mono,Red on color)
+24  18         -- Displays as itself (Up arrow)
+25  19         -- Displays as itself (Down arrow)
+26  1A         -- Displays as itself (Right arrow)
+27  1B         -- Displays as itself (Left arrow)
+28  1C ##      -- Repeat the row above "##" times, must be in column 1
+29  1D ##      -- Write "##" blanks, do not advance location (clears area)
+30  1E ## ch   -- Make column by writing "ch", "##" times, vertically
+31  1F ## ch   -- Write "ch", "##" number times
+
+There are shorthand aliases for some of the escape sequences.  These are:
+
+   \a - \7         - Bell 
+   \b - \8         - Backspace
+   \t - \9         - Tab
+   \n - \10 or \xA - Linefeed
+   \v - \11 or \xB - Vertical Tab -- Scrolls the screen
+   \f - \12 or \xC - Form Feed    -- Clears Screen
+   \r - \13 or \xD - Carriage Return
+
+The sequences are functionally identical to the numerical sequences.  They 
+are also the same sequences used in the C programming language.
+
+Now for extensive descriptions of each of the escape sequences.
+
+
+       Escape Character : 1
+                Purpose : Set location for subsequent writes
+                  Usage : "\1\ro\col"
+ Additional Character 1 : Number of rows to add to current location
+ Additional Character 2 : Number of columns to add to current location
+
+ This sequence causes subsequent characters to be written starting at the
+ location specified by (row+current row,column+current column).  Where the 
+ next two characters in the string are "row" and "column".  The row and 
+ column numbers can  be negative if the following write needs to be in a 
+ lower numbered column or row.  If the addition results in an out of range 
+ value then the row/column will not change.  When leaving the row/column 
+ unchanged, a value that is always out of range (such as 100) should be 
+ used in place of a zero (null byte) since the null byte will terminate 
+ the string.
+
+
+       Escape Character : 2 
+                Purpose : Set location for subsequent writes
+                  Usage : "\2\ro\col"
+ Additional Character 1 : Row for new location
+ Additional Character 2 : Column for new location
+
+ This sequence causes subsequent characters to be written starting at the
+ location specified by (row,column), the next two characters in the string.
+ In the direct writes the (row,column) values are relative to the upper
+ right-hand corner of the screen.  In the serial writes the (row,column)
+ values are relative to the current window as defined by the (wt,wl,wb,wr)
+ variables (variable names are mnuemonic for Top, Left, Bottom and Right).
+ The row and column values start numbering at (1,1) not (0,0).
+
+
+       Escape Character : 3 
+                Purpose : Set the cursor location when write is complete
+
+ This sequence has no effect in serial writes since the cursor is always
+ placed at the end of the string (actually after the subsequent prompt).
+ If serial writes have been suppressed then the direct writes can place
+ the cursor using this sequence.  The cursor will be set at whatever location
+ in the string that the "\3" sequence would be written if it were a normal 
+ character.
+
+
+       Escape Character : 4
+                Purpose : Disable non-standard escape characters
+
+ Most DOS display functions (like the "type" command) only support a few
+ escape characters.  These are the bell (7), backspace (8), tab (9), linefeed
+ (10 dec, 0A hex) and the Carriage Return (13 dec, 0D hex).  When this
+ escape sequence is encountered all escape characters are turned off except
+ for those mentioned above.  This is useful for writing the contents of files
+ which may inadvertently have a few escape characters in them.
+
+
+       Escape Character : 5
+                Purpose : Display graphic of escape character
+                  Usage : "\5ch"
+   Additional Character : The character to display
+
+ The escape characters themselves display as a variety of interesting
+ symbols.  There may be times that you want to display the symbol.  This
+ command allows you to display a single symbol.  
+   
+   For example, the command: rite "\5\1 I feel happy! \5\1"
+   would display the message "I feel happy" with little happy faces
+   before and after.
+
+
+       Escape Character : 6
+                Purpose : Turn off all escapes (except terminating zero)
+
+ This command disables all of the escape characters except the terminating
+ zero.  It is useful for displaying binary data when debugging or using
+ an unknown file.
+
+
+       Escape Character : 7 or \a
+                Purpose : To make an audible bell
+
+ This is useful when wanting to make a noise to notify a user of a problem
+ who may not be nearby.
+
+
+       Escape Character : 8 or \b
+                Purpose : To back the write location up one position
+
+ This is the same as a relative move back one column.  It is supported since
+ DOS supports this function.
+
+
+       Escape Character : 9 or \t
+                Purpose : To go to the next tab stop
+
+ This escape character is useful for assuring that columns will be aligned
+ properly when uneven length data is being displayed.  The default tab
+ widths is 10 characters which is compatible with IBM mainframe printers
+ and 3780's.  PC's normally have tab stops every 8 characters.  The "TW"
+ variable can be used to set the widths to any character value.
+
+
+       Escape Character : 10 dec, 0A hex or \n
+                Purpose : Move down one line
+
+ This is the same as a relative move down one line except that it will
+ scroll if necessary.  It does not affect the column setting.  This
+ character is almost always coupled with a carriage return ("\r") to put
+ the location back to column 1.
+
+
+       Escape Character : 11 dec, 0B hex or \v
+                Purpose : Scroll window "##" lines
+                  Usage : "\11\##"
+   Additional Character : The number of lines to scroll
+
+ This sequence can cause the window to scroll any number of lines up or down.
+ It is the only way to get a reverse scroll in the command language since it
+ will accept a negative value.  The whole screen will scroll on direct
+ writes.  This is not a standard DOS capability.
+
+
+       Escape Character : 12 dec, 0C hex or \f
+                Purpose : Clear the video window
+
+ This is the "Form Feed" escape character.  It serves to clear the screen in
+ this video write but DOS functions will merely display a little feminine
+ symbol.
+
+
+       Escape Character : 13 dec, 0D hex or \r
+                Purpose : Return to column 1
+
+ This is the standard DOS carriage return except that it is relative to the
+ window.  It is almost always coupled with a linefeed to begin the next line.
+
+
+       Escape Character : 14 dec, 0E hex
+                Purpose : Toggles the flashing attribute bit
+
+ This character is used to make displayed characters flash.  The other 
+ attributes that are currently being used are left unchanged.  To make a
+ part of the string flash merely put a "\14" before and after the
+ affected portion.  If the value is not toggled off before the end of the
+ string it will NOT cause the next write to display in flashing mode.  The
+ effect only lasts until the end of the string.
+
+
+       Escape Character : 15 dec, 0F hex
+                Purpose : Toggles the Intensity attribute bit
+
+ This is similar in behavior to the "\14" character above except that if
+ effects the brightness with which the characters are displayed rather than
+ the flashing.
+
+
+       Escape Character : 16 dec, 10 hex
+                Purpose : Toggles automatic use of the graph attribute
+
+ This character is used to enable and disable the feature that automatically
+ uses the graph attribute for characters numbers above 127.  This allows the
+ current attribute to be used when necessary.  This is useful when using
+ a few graphic characters to construct images that are not borders.  It is
+ a toggle but will automatically reset at the end of the string.  The value
+ can be permanently disabled by setting the global variable "GE" to FF hex.
+ It can be re-enabled by setting the variable to 7F hex.
+
+
+       Escape Character : 17 dec, 11 Hex
+                Purpose : To set video attribute
+                  Usage : "\17\##"
+   Additional Character : New Attribute byte 
+
+ This changes the video attribute of characters put to the screen until 
+ the end of the string or another escape sequence sets the attribute to 
+ another value.  This is typically used when an unusual attribute is 
+ desired for a character or small set of characters.  The escape sequences 
+ for one of the default, high, key or graph attributes are shorter and, 
+ normally, more useful.  This is also somewhat less flexible in that the
+ string has to be modified if different value are to be used in different
+ video modes.  The other escape sequences can be globally modified at the
+ start by setting the appropriate variables.
+
+
+       Escape Character : 18 dec, 12 Hex
+                Purpose : To set video attribute back to default
+
+ This is used to set the attribute back to the value of the DA variable
+ for direct writes and to the WA variable for the serial (window) writes.  
+ The default values in color are bright yellow (0E hex) and white (07 hex) 
+ respectively.  They both default to normal (07 hex) in monochrome.
+
+
+       Escape Character : 19 dec, 13 Hex
+                Purpose : To set video attribute to change attribute
+
+ This is used to set the attribute to the value of the CA variable.  The 
+ default value in color is bright white (0F hex).  The monochrome default 
+ to normal (07 hex).
+
+
+       Escape Character : 20 dec, 14 Hex
+                Purpose : To set video attribute to high attribute
+
+ This is used to set the attribute to the value of the CA variable.  The 
+ default value in color is bright cyan (0B hex).  The monochrome default 
+ is normal (07 hex).
+
+
+       Escape Character : 21 dec, 15 Hex
+                Purpose : To set video attribute to graph attribute
+
+ This is used to set the attribute to the value of the GA variable.  
+ The default value in color is bright green (0A hex).  The monochrome 
+ default is normal (07 hex).
+
+
+       Escape Character : 22 dec, 16 hex
+                Purpose : Sets attribute to reverse video as defined by the 
+                          RA variable.
+
+ This sets to the attribute to the value of the RA variable until the end of
+ the string or until another escape sequence modifies the video attribute.
+ The default value of RA is 70 hex in monochrome and 20 hex (green background
+ black characters) in color.
+
+
+       Escape Character : 23 dec, 16 Hex
+                Purpose : To set video attribute to underline attribute
+
+ This is used to set the attribute to the value of the UA variable.  
+ The default value in color is bright red (0C hex).  The monochrome 
+ default is underline (01 hex).
+
+        Characters : 24-27 dec, 18-1B hex
+           Purpose : Display arrows
+
+ Technically, these are not "Escape characters".  They merely display as
+ their IBM character values.  The values are:
+
+      24 dec, 18 hex -- Up arrow
+      25 dec, 19 hex -- Down arrow
+      26 dec, 1A hex -- Right arrow
+      27 dec, 1B hex -- Left arrow
+
+
+       Escape Character : 28 dec, 1C Hex
+                Purpose : To copy the line above
+                  Usage : "\28\##"
+   Additional Character : The number of times to copy the line
+
+ This is used to copy the line above a number of times.  This produces 
+ strange results when not used in column one (the prior window widths worth
+ of characters are copied instead of an even line).
+
+
+       Escape Character : 29 dec, 1D Hex
+                Purpose : Clears an area ahead of the current location
+                  Usage : "\29\##"
+   Additional Character : The number locations ahead to clear
+
+ This sequence is used to clear the area for a string prior to writing it.  
+ It does this by writing a set of number of blanks.  The character following 
+ the escape character is the number of blanks to write the character.  This
+ sequence does not change the location (subsequent characters will be written
+ over the blanks).
+
+
+       Escape Character : 30 dec, 1E Hex
+                Purpose : Make a column
+                  Usage : "\30\##ch"
+ Additional Character 1 : The number of rows in the column
+ Additional Character 2 : The character to write in the column
+
+ This sequence is used to create a column on the screen.  The column will
+ start at the current location and will go down as many rows as specified
+ by the character "##" character following the "\30".  The column will be 
+ made using the "ch" character which should follows the "##".  Once the
+ column is written the location will be in the column below the last
+ character written.  If drawing a box, the location will be where a
+ corner should be written.  This sequence will scroll the screen if the
+ column is too long to fit.
+
+
+       Escape Character : 31 dec, 1F Hex
+                Purpose : Write a character multiple times
+                  Usage : "\31\##ch"
+ Additional Character 1 : The number of times to write the character
+ Additional Character 2 : The character to write
+
+ This sequence is normally used to write horizontal lines or blanks in an
+ efficient manner.  The "##" character is the number of times to write
+ the character and the "ch" character is the character to write.  The 
+ location is set to one column beyond the last character written.
+
+
+
+8.5 Status Variables
+
+The status variables are the ones which appear in the boxes in the upper
+part of the screen and on the bottom line.  These can be made to appear
+anywhere on the screen with different formats and colors.  The different
+variables which may be displayed are:
+
+  0 -- Send Mode, an integer value from 0 to 7.  It is used to index and
+       array of strings which are:
+        0 - "Std. Vary   " 
+        1 - "Std. Fixed  " 
+        2 - "Std. Binary "
+        3 - "Std. Hex    "
+        4 - "Tran. Vary  "
+        5 - "Tran. Fixed "
+        6 - "Tran. Binary"
+        7 - "Tran. Hex   "
+       The values of these strings cannot be changed yet but the option will
+       be added soon.  This is true of any of the strings that represent
+       names for the status variables.
+
+  1 -- Current Directory, This string is normally displayed on line 2.
+       It is a varying length string so the format string should contain
+       escape sequences to erase the prior value.  See the second
+       example in section 8.6 for more information.
+
+  2 -- Bytes Received. This is the number of bytes received on the last or
+       current reception.  By default it is displayed when receiving but
+       not when sending so it can occupy the same space as Bytes Sent below.
+       This is a long data type, the "l" option must be included in the
+       format string specification (see sections 5. and .).  The third
+       example in section 8.6 is for this variable.
+
+  3 -- Bytes Sent.  This is the number of bytes sent in the current or last
+       transmission.  This is also a long value.
+
+  4 -- This is the Printer Auto-Naming option, 0 displays as "No " and
+       1 displays as  "Yes".
+
+  5 -- Printer Filename.  This is also a varying length string.
+
+  6 -- Printer Standard Conversion.  This is the conversion type for a
+       standard receptions to the printer.  The values and corresponding
+       messages are:
+         0 -- "Vary  "
+         1 -- "Fixed "
+         2 -- "Binary"
+         3 -- "Hex   "
+
+  7 -- Printer Transparent Conversion.  Same values as 6 above.
+
+  8 -- Punch Auto-Naming option same as 4 except for punch.
+
+  9 -- Punch Filename. Same as 5 except for punch.
+
+ 10 -- Punch Standard Conversion.  Same values as 6 above.
+
+ 11 -- Punch Transparent Conversion. Same values as 6 above.
+
+ 12 -- Receive Block count.  This is an integer.  It displays in the
+       "Blocks" field during a reception (by default).
+
+ 13 -- Receive Enquiry Count.  Another integer, It displays in the
+       "Enquiries" field during a reception (by default).
+
+ 14 -- Receive Nak count.  Integer, displays in "Naks" field.
+
+ 15 -- Send block Count.  This integer displays in the "Blocks" field
+       during a Send.
+
+ 16 -- Printer destination, displays as "Printer" or "Punch  ".
+
+ 17 -- Send filename.  Varying length so it requires a clear sequences.
+
+ 18 -- Send Enquiry Count.  Integer.
+
+ 19 -- Send Nak Count.  Integer.
+
+ 20 -- This status variable is used to the "R" and "S" in the upper left part
+       of lower right box on the default screen.  It is "R" when sending,
+       "S" when receiving and does not display anything otherwise (it however
+       will not overwrite the prior "R" or "S" if neither is true).
+
+ 21 -- Status Value.  This generates the bottom line in the default screen.
+       Its possible values are:
+         "    Offline     "
+         "Waiting for Call"
+         "   Connecting   "
+         "    Dialing     "
+         " Got Dial Tone  "
+         "    Ringing     "
+         "Modem Handshake "
+         "     Online     "
+         "    Sending     "
+         "   Receiving    "
+
+       See the example format string in section 8.6 for this one.
+
+ 22 -- This generates the "s" and "t" beside the "R" and "S".  It is "s" if
+       the send or receive was standard and "t" if the last send or receive
+       was transparent.
+
+ 23 -- This is the date, it is passed two integers month and day.  Year
+       is passed as a string.  The order is month, day, year.  See the
+       example format string in section 8.6 for this one.
+
+ 24 -- Time, passed hour, minutes and second.  See the example format
+       string for this one.
+
+The locations, colors, times and many other details of how these options are
+displayed is under you're control.  The options used to control these are:
+
+  format string
+  status mask
+  maximum length parameter (for strings only)
+
+The format string is the most significant of these.
+
+
+8.6 The Status Variable Format String
+
+The format string determines the location color and other details of how the
+Status Variable is displayed.  It can contain any of the sequences from
+section 8.5 above and also contains a format specification which is the same
+as the one used in the C programming language's "printf" statement.  This 
+string typically has four or five components:
+
+ 1  Attribute (color) Escape sequences
+    These are sequences from section 8.4 above.  The sequences 12-17 are 
+    recommended to be the first byte of the format string.  In fact 7 of 
+    the status variables require that the first byte be one of these 
+    sequences (if the variable is displayed at all).  These are:
+
+       5 - Printer Filename
+       6 - Printer Standard Conversion
+       7 - Printer Transparent Conversion
+       9 - Punch Filename
+      10 - Punch Standard Conversion
+      11 - Punch Transparent Conversion
+      17 - Send Filename
+
+    The reason these must begin with the attribute byte is because the color
+    is switched dynamically while a transmission or reception is going on.
+    The first character of the format string is dynamically switched between
+    the Change attribute setting (when idle) and the High attribute setting
+    (when active).
+
+    The escape sequences are processed from left to right so the highlighting
+    of the active printer/punch/send filenames can be disabled by following
+    the first attribute setting byte with another to cancel its affect.
+
+    Other format strings do not have any special requirements concerning
+    escape sequences for setting attributes.
+
+  2 The location to display the variable.  This must be included since the 
+    variable will be displayed at a semi-random location if it is not.  The
+    "\2" escape sequence is used to set the location.
+
+  3 The format specification (like C's printf).  This is necessary if the
+    variable is going to be displayed.  The format spec begins with a
+    percent sign ('%') and is followed by characters which describe the 
+    way in which the variable will be displayed.  The other characters are
+    very similar to format options used in the "RITE" and "DRITE" commands.
+    Section 8.9 is on the C format specification.
+
+  4 A NULL (true zero) at the end of the format string to terminate it.
+
+Other parts of the format string are normally printable characters.  These
+characters are displayed as they would be with a normal direct video write 
+(see the "DRITE" function).
+
+Examples:
+
+A format string for the Send Mode (status variable 0)
+
+   "\19\2\5\47%s\0"
+
+  The "\19" sets the color to that Change video attribute.  By default it 
+  is white on color screens and normal on monochrome screens.  The built in
+  variable "CA" can be used to modify the affect of the "\19" (same as \x13).
+
+  The "\2\5\47" causes the value to be displayed at row 5 and column 47.  The
+  rows and columns are numbered starting at row 1, column 1 in the upper
+  left-hand corner.
+
+  The "%s" is the format specification used to display the string.
+
+  The "\0" terminates the format string.
+
+  The Send Mode format is a typical format string.
+
+
+This example is for the current directory display (status variable 1)
+
+    "\19\2\2\23\29\27%s\0"
+
+  The "\19" sets the color.
+  The "\2\2\23" moves to location row 2, column 23.
+  The "\29\27" erases the previous directory name (does not advance location).
+  The "%s\0" are the format string and string terminator (same first example).
+
+  The clearing of the prior string is required for strings which have varying
+  lengths.  In general, the status variables which display as strings
+  (conversion types, send mode, etc.) have blanks filled to the left to
+  assure that the the next value will completely overwrite the prior value.
+
+  Also, the status variables are only re-displayed when the values change
+  so there is not a "flickering" effect when a string is cleared and then
+  immediately rewritten.
+
+
+This example is for the bytes received variable (number 2).
+
+    "\19\2\7\62%-10lu\0"
+
+  The "\19\2\7\62" set the color and location.
+  The format specification is "%-10lu".
+    The "-" causes the display to be left justified.
+    The "10" makes sure that 10 blanks to the right are written (this clears
+      any prior value from that location).
+    The "l" is necessary because the bytes received is a long value.
+    The "u" is for unsigned decimal display.
+  The "\0" terminates the string.
+
+
+This example is for the Status Value variable, number 21.
+
+    "\2\25\1\22\29\80\2\25\32%s\0"
+
+  The "\2\25\1" sets location to bottom row (25) and column 1.
+  The "\22" sets color to reverse video (determined by the "RA" variable).
+  The "\29\80" writes a full line of reverse video blanks.
+  The "\2\25\32" goes back to the location where the string is to be written.
+  The "%s\0" is the format specifier and string terminator.
+
+  The strings are center justified by having the display values centered 
+  within their length (See the values in section 8.5).  The names for the
+  different states will be added shortly so the centering affect will be able
+  to be achieved for any of the values which display as strings.
+
+
+This example is for the Date variable, number 23.
+
+    "\19\2\2\13%d/%d/%s\0"
+
+  The "\19\2\2\13" sets the attribute and location.
+  The "%d" determines the format for the month.
+  The "/" is printed.
+  The second "%d" is for the day.
+  The second "/" is printed.
+  The "%s" is needed because the year is passed in as a two character string.
+  The "\0" terminates the format string.
+
+
+This example is for the Time variable, number 24.
+
+    "\19\2\2\3%.2d:%.2d:%.2d\0"
+
+  The "\19\2\2\3" determine the attribute and location.
+  The "%.2d"'s cause the values to be displayed with so that they always
+    occupy 2 locations with a leading zero on the left if necessary.
+  The ":"'s are displayed between the values
+  The "\0" terminates the format string.
+
+
+8.7 The Status Mask value
+
+The status mask value one byte value associated with each status variable
+which determines whether it will be displayed or not.  The status mask
+value is bitwise and'ed against an internal variable to determine if the
+variable will be displayed.  The bits in the internal variable are as
+such:
+
+  Bit      Value
+   0   -- Always 1
+   1   -- 1 if sending, 0 otherwise
+   2   -- 1 if receiving, 0 otherwise
+   3   -- 1 if the printer is defined to be active, 0 if punch
+   4   -- 1 it the punch is defined to be active, 0 if printer
+   5   -- Always 0
+   6   -- Always 0
+   7   -- Always 0
+
+Bit 0 is always 1 so a mask value of 1 will cause the status variable to
+always be displayed (if its value is changed).  The default masks of all
+status variables except 2,3,12,13,14,15,18 and 19 are 1.
+
+Bits 1 and 2 are not complements.  If neither a receive or send is going
+on then both bits will be 0.  A mask of 02 hex will cause a status variable 
+to be updated only when sending and a mask of 04 hex will cause a status 
+variable to be updated only when receiving.
+
+Status variables 3,15,18 and 19 have 02 as their default mask and variables 
+2,12,13 and 14 have 04 as their default mask.  This allows any of 3,15,18
+or 19 to occupy the same place on the screen as any of 2,12,13 or 14.
+
+Since nothing will be written for these values when neither a send or
+receive is going on the value of the last send or receive will persist
+until a new send or receive occurs. 
+ 
+When the package is loaded, neither bit will be 1 so the portion of the 
+screen in which a send/receive variable is written will be blank.  In the
+default D3-3780 screen "0"'s are explicitly written out in the screen
+itself to stop these locations from being blank.
+
+Bits 3 and 4 are complements of one another.  The active destination is
+always one or the other even if a receive is currently not going on.  The
+initial value is set to the printer and afterwards will be set to whichever 
+was the last to receive data.
+
+The "FMASK" command is used to set the value of this mask.
+
+
+8.8 The Status Variable Maximum Length value
+
+The maximum length value is used to truncate variable length strings so that
+they won't overwrite other parts of the screen when they get too long.  The
+length parameter is used in the default package for filenames and the
+current directory.  The strings are truncated on the left leaving the
+rightmost characters.  The rightmost characters in a filename are generally 
+more relevant than the first so the maximum length parameter is useful in
+cases in which a filename is displayed.  If truncation on the right is
+desired instead the precision value of the format string can be used to
+limit the number of characters displayed.  The "FMAX" command is used to
+set the maximum length values.
+
+
+8.9 The C format specification
+
+    Section 5.7 covers the format options for writing strings out.  These
+    format parameters differ in only a few ways.  These are:
+
+      1 - Case is significant, the upper-case values will not necessarily work
+      2 - The string must be preceded by a '%' sign
+      3 - The 'R' for carriage return is not supported
+
+    The following reiterates most of what is in section 5.7 (However,
+    section 5.7 has examples).
+
+    Here is a simplified explanation of the fields of a format statement:
+
+            %[flags][width][.precision][l]type
+
+         Each field of the format specification is a single
+         character or number signifying a particular format
+         option.  The following describes each field.
+
+         The 'type' character determines whether the associated
+         argument is interpreted as a character, string, or
+         number.   The simplest format specification
+         contains only a percent sign and a 'type' character. (For
+         example: %s prints a string.) The 'type' characters are:
+
+          d   Integer         Signed decimal integer
+          i   Integer         Signed decimal integer
+          u   Integer         Unsigned decimal integer
+          o   Integer         Unsigned octal integer
+          x   Integer         Unsigned hexadecimal integer  (abcdef)
+          X   Integer         Unsigned hexadecimal integer  (ABCDEF)
+
+          c  Character        Single character
+
+          s  String           Characters printed up to the first null
+                              character ('\0') or until 'precision'
+                              is reached.
+
+Flags:    An optional sequence of flag characters controls the
+          justification of output and printing of signs, blanks,
+          decimal points, and octal and hexadecimal prefixes.  The
+          flag characters available are:
+
+   Flag                Action                           Default
+   컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴�
+    �          Left justify the result within        Right justify
+               the field width.
+
+    +          Prefix the output value with a        Sign appears only
+               + or � sign if it is of a signed      for negative
+               type.                                 signed values(�)
+
+    blank      Prefix the output value with a        No blank
+               blank (ASCII 32) if the output
+               values is signed and positive;
+               the "+" flag overrides the blank
+               flag, and a positive signed value
+               will be output with a sign.
+
+    #          When used with o, x, or X, the        No prefix
+               "#" flag prefixes any nonzero
+               output value with 0, 0x, or 0X,
+               respectively.
+
+            More than one flag can appear in a format specification.
+
+      Width:    The optional width specifier is a non훞egative decimal
+                integer specifying the minimum number of characters to
+                print, padding with blanks and zeros.  Width never causes
+                a value to be truncated.
+
+  Precision:    An optional precision specifier is a non훞egative decimal
+                integer preceded by a period (.) which specifies the
+                maximum number of characters printed for all or part of
+                the output field, or the minimum number of digits printed
+                for integer values.  Precision can cause truncation of
+                the output value.  Here's how precision can affect
+                different types:
+
+d,i,o,u,x,X:    With any of these types, precision specifies the minimum
+                number of digits to be printed. If number of digits is
+                less than specified in precision, output is padded on the
+                left with zeros.  The value is not truncated when the
+                number of digits exceeds precision. By default, if
+                precision is 0 or omitted, the precision is set to 1.
+
+          c:    Precision has no effect.  By default, one character is
+                printed.
+
+          s:    Precision specifies the maximum number of characters to
+                be printed. Characters in excess of precision are not
+                printed. By default, characters are printed until a null
+                character is encountered.  This will cause the leftmost
+                characters of the string to be displayed.  The maxlen
+                value (set by the "FMAX" command) will leave the
+                rightmost characters.
+
+Mandatory l:    The two status variables Bytes Received (2) and Bytes 
+                Sent (3) require that an "l" precede the type element
+                since these variables are of a the "long" data type.
+                These values are long since they can be larger than
+                65535.  Other variables should not have an "l" preceding
+                the type specifier.

@@ -1,0 +1,39 @@
+D3-3780 Preliminary Read me File
+
+Note: This document is a hodge-podge of notes.  Some of these will be in
+      the user manual and some will be in technical documents or appendices.
+      Therefore, the level of assumed knowledge will vary greatly from
+      section to section.
+
+1.0 General Information
+
+This is a readme for the alpha site D3-3780 software from D3 Softdesign.  
+It is intended to augment the UDS Dial manual.   The readme should
+contain enough information to operate D3-3780.  First, a little about what
+D3-3780 does and its intended applications.
+
+D3-3780 works with Universal Data Systems' Sync-Up modems to emulate an IBM
+3780 work station.  It should work with any device that follows IBM's
+Bisynch 3780 protocol and is operating over a compatible modem.  For the
+sake of brevity, I will refer to an IBM 3780 work station or any device that
+emulates a 3780 work station as merely a "3780" for the remainder of this
+document.
+
+The current version of D3-3780 can work by itself or in conjunction with
+UDS' dialer which is included on the D3-3780 disk.  D3-3780 has built in
+dialing and auto answer capabilities but the setting of the modem options
+is not convenient (the options must be entered in hexadecimal) without using 
+UDS' dialer.  Convenient commands to support the setting of modem options 
+will be added to D3-3780 shortly.
+
+The files on your D3-3780 disk are:
+
+  README.DOC      This file.
+  D3-3780.EXE     The D3-3780 3780 emulator.
+  D3-3780.HLP     Dummy help file for emulator (the helps are not helpful).
+  SU.EXE          The UDS dialer.
+  SU.HLP          The dialer's help.
+  D3.BAT          Batch file which runs the dialer and then automatically 
+                  runs D3-3780 if the connection has been established 
+                  successfully.
+  MODEMS.DTA	Modem design information

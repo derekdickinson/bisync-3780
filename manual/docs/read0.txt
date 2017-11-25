@@ -1,0 +1,50 @@
+ 1.0 General Information
+
+ 2.0 Background Information and terms
+ 2.1 The "Std" and "Tran" abbreviations as used in D3-3780
+ 2.2 The names "Vary", "Fixed", "Binary" and "Hex" as used in D3-3780
+
+ 3.0 The Default Command Screen
+
+ 4.0 Interactive Command Line Interface
+ 4.1 Interactive Editing keys
+ 4.2 Delimiters
+
+ 5.0 Batch Mode
+ 5.1 Built in Variables
+ 5.2 Constants
+ 5.3 Special Symbols
+ 5.4 Labels
+ 5.5 "Scalar" and "Pointer" as used in this document
+ 5.6 Pointer Variable Fundamentals
+ 5.7 Common Pointer Errors
+ 5.8 Suppressing Video Output using '@' and '!'
+ 5.9 Booting D3-3780 in batch mode
+
+ 6.0 Command Summary by Classes
+ 6.1 Branching Control Commands
+ 6.2 File Commands and Handles
+ 6.3 DOS Shell commands
+ 6.4 Data Movement Commands (determination of buffer length)
+ 6.5 Memory Allocation Commands
+ 6.6 Other Pointer Assignment Commands
+ 6.7 Screen Control Commands
+ 6.8 Format options for writing strings out
+
+ 7.0 Alphabetical Command Summary
+
+ 8.0 Screen Customization Fundamentals
+ 8.1 Video Attributes
+ 8.2 Video Modes
+ 8.3 Attribute Variables
+ 8.4 Video Escape Sequences
+ 8.5 Status Variables
+ 8.6 The Status Variable Format String
+ 8.7 The Status Mask value
+ 8.8 The Status Variable Maximum Length value
+ 8.9 The C format specification
+
+ 9.0 The D3-3780.CFG file and its options
+ 9.1 Setting the Package and Configuration file names
+ 9.2 Common Configuration File Setups
+ 9.3 An Example Configuration File

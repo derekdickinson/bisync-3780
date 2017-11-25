@@ -1,0 +1,117 @@
+@CHAPTER HEAD = Interactive Command Line Interface
+
+<$M[Intcom]><$R[V*,Packname]D3-3780> has an interactive command line 
+interface and a script interpreter for running unattended. These two 
+are very similar in that most of the commands can be used in either 
+one. 
+
+@SECTION HEAD = <$IEditing Keys>Interactive Editing Keys
+
+<$M[Edkeys]><$SF1;Editing Keys><$SF3;Editing Keys><$SF5;Editing Keys><$SF10;Editing 
+Keys><$SBackspace;Editing Keys><$SLeft Arrow;Editing Keys><$SRight 
+Arrow;Editing Keys><$SHome;Editing Keys><$SEnd;Editing Keys><$SInsert;Editing 
+Keys><$SDelete;Editing Keys><$SEsc;Editing Keys>When you are at the 
+<$R[V*,Packname]D3-3780> prompt there are several editing keys at 
+your disposal. Some of these are similar to DOS' keys but differences 
+exist. Here is a list of each key and its function:
+
+@LIST EDGE IND = F1
+
+@LIST ITEM = This key has the same function as it does in DOS. It 
+will copy the previous command a character at a time.
+
+@LIST EDGE IND = F3
+
+@LIST ITEM = This key has the same function as it does in DOS. It 
+will copy the portion of the previous command which is to the right 
+of the cursor to the current line.
+
+@LIST EDGE IND = F5
+
+@LIST ITEM = Abort command but store command so that F1 and F3 will 
+bring it back up.
+
+@LIST EDGE IND = F10
+
+@LIST ITEM = Delete the entire command.
+
+@LIST EDGE IND = Backspace
+
+@LIST ITEM = Moves cursor back (left) one position and deletes the 
+character to the left of the original cursor. This is identical to 
+DOS.
+
+@LIST EDGE IND = Left Arrow
+
+@LIST ITEM = Moves the cursor back (left) one position but does not 
+delete the prior character. In DOS, this key operates just like the 
+backspace key.
+
+@LIST EDGE IND = Right Arrow
+
+@LIST ITEM = Moves the cursor right one position unless you are already 
+at the end of the command.
+
+@LIST EDGE IND = Home
+
+@LIST ITEM = Bring the cursor to the beginning of the command.
+
+@LIST EDGE IND = End
+
+@LIST ITEM = Bring the cursor to the end of the command.
+
+@LIST EDGE IND = Insert
+
+@LIST ITEM = Toggles Insert/Overwrite mode. Normally, if a letter 
+is typed while the cursor is over a character in the command the new 
+letter will be inserted. This is insert mode. If <$R[V*,Packname]D3-3780> 
+is in overwrite mode the old character is replaced with the new one. 
+The cursor will appear as a large flashing block in overwrite mode.
+
+@LIST EDGE IND = Delete
+
+@LIST ITEM = Delete the character over the cursor.
+
+@LIST EDGE IND = Esc
+
+@LIST ITEM = A general abort from any type of failed operation. Will 
+abort a command in the middle of it but will not store the command 
+like the F5 key. In this respect the key resembles DOS' use of it.
+
+The individual commands that are specific to the interactive mode 
+will be explained in the command summary.
+
+@SECTION HEAD = Delimiters
+
+<$M[Dels]>Certain characters are used to separate parameters<$IParameters;Separating> 
+in the commands. These characters are generally used in the same ways. 
+They are not always interchangeable. These characters are:
+
+@LIST EDGE IND = <169> <170> (space)
+
+@LIST ITEM = Normal delimiter used to separate command and first parameter.
+
+@LIST EDGE IND = <169>,<170> (comma)
+
+@LIST ITEM = Interchangeable with a space as far as <$R[V*,Packname]D3-3780> 
+is concerned.
+
+@LIST EDGE IND = <169>;<170> (semicolon)
+
+@LIST ITEM = Used for optional parameters that modify mandatory parameters.<N>The 
+semicolon is used in commands that take a set of parameters to set 
+options that affect the parameter before it. See the <169>s<170> and 
+<169>rite<170> commands.
+
+@LIST EDGE IND = <169>+<170> (plus sign)
+
+@LIST ITEM = Used for commands that have a variable number of parameters.<N>Most 
+commands will actually take a blank or comma also but the plus accurately 
+describes the behavior.
+
+@LIST EDGE IND = <169>=<170> (equal sign)
+
+@LIST ITEM = Indicates either equality or assignment depending on 
+the command. Used only in script commands.
+
+

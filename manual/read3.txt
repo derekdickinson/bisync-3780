@@ -1,0 +1,110 @@
+@CHAPTER HEAD = The Default Command Screen
+
+<$M[Defscn]><$R[V*,Packname]D3-3780> is command driven. Script files 
+can be written to give <$R[V*,Packname]D3-3780> a menu driven interface 
+if desired. The command driven interface can be used in either interactive 
+or script mode. The interactive mode takes commands from the keyboard 
+and the script mode takes commands from a text file. An example of 
+the default command driven <$R[V*,Packname]D3-3780> Screen appears 
+below:
+
+The boxes at the top of the screen contain status and configuration 
+information. The area below is a <$IWindow>window which scrolls as 
+commands are entered and information displayed (like the example directory). 
+The bottom line is for additional status information (with <169>Online<170> 
+written on it).
+
+Starting at the top of the screen I'll explain the different parts. 
+The top box contains the time, date, current directory and a copyright 
+message.
+
+Actual 3780 workstations have a <$IPrinter>printer and, optionally, 
+a <$IPunch>punch. A host or other 3780 device can specify the destination 
+(printer or punch) for each transmission. <$R[V*,Packname]D3-3780> 
+maintains separate configuration information for each of these psuedo-devices. 
+
+
+The two boxes to the lower left (with <169>Punch File<170> and <169>Print 
+File<170> in the corners) display configuration information on the 
+psuedo-printer and psuedo-punch. The designations <169>Print File<170> 
+and <169>Punch File<170> mean the filename to which the printer or 
+punch data will be sent. The word <169><$ICON>CON<170> can be used 
+in this place to have incoming data sent to the screen. Note that 
+although the names of the printer and punch are somewhat archaic, 
+the distinction can be used to divide transmission into two groups 
+which are processed differently.
+
+Below the file designations are the <MI>Std<D>, <MI>Tran<D> and <$IAuto-Naming><MI>Auto-Name<D> 
+indicators. These are the buffer formatting and auto-naming options. 
+The possible values for the buffer format options are: <MI>Vary<D>, 
+<MI>Fixed<D>, <MI>Binary<D> and <MI>Hex<D>. As described in Section 
+<$R[S*,Vary]2.2>. The Auto-Name option determines if separate files 
+will be concatenated or whether a new extension will be created for 
+each reception. If yes, an extension of <169>000<170> will replace 
+a non-numeric extension and after that the extension will increment 
+when each new file is received. Otherwise, additional files will be 
+appended to the earlier files. When auto-naming is enabled an attempt 
+to define to a name that already exists will cause the extension to 
+increment until an unused name is found.
+
+The box to the right of the printer box (with <169>Send File<170> 
+in it) contains status information for the file being sent. The send 
+file itself displays the name of the file being transferred or <169>CON<170> 
+if a message is being sent from the command prompt. The <169><$IMode;Communication>Mode<170> 
+indicates whether the transmission is standard or transparent (<MI>Std<D> 
+or <MI>Tran<D>) and what <$IBuffer;Translation>buffer translation 
+technique is being used (<MI>Vary<D>, <MI>Fixed<D>, <MI>Binary<D> 
+or <MI>Hex<D>). To the right of this is the indicator of whether the 
+file is being sent to the remote's printer or punch.
+
+Below the sending box is a status box with some values in it. These 
+values refer to the sending status when sending and the receive status 
+when receiving. An <169>Rs<170> in the upper right hand corner of 
+this box would indicate that the data is for <169>R<170>eceiving in 
+<169>s<170>tandard mode. There will be either an R or S (receive or 
+send) as the first character and an <169>s<170> or <169>t<170> (standard 
+or transparent) for the second character. Additional information can 
+be obtained using the <169>ST<170>atistics command.
+
+@LIST EDGE = <$IBytes Sent/Received>Bytes Sent/Received:
+
+@LIST ITEM = This is the number of bytes sent or received in the last 
+or current reception or transmission (the number is updated during 
+the reception). This number is not very meaningful if the receive 
+filename is <169>CON<170>. In this case, the remote will send each 
+message as if it were a complete file.
+
+@LIST EDGE = # of <$IBlocks>Blocks:
+
+@LIST ITEM = This is the number of blocks (chunks of data) received 
+or transmitted to the receive or transmit filenames. These numbers 
+are updated dynamically. The number will increment when the block 
+is stored to disk in the receive case or when the block is taken from 
+the disk in the send case.
+
+@LIST EDGE = # of <$INaks>Naks:
+
+@LIST ITEM = This is the number of Naks (No acknowledgments) sent 
+or received. A Nak is a message sent by the receiving computer when 
+an error is detected in a transmitted block. The number of Naks will 
+normally be quite small unless the telephone line quality is poor. 
+Bad data blocks are automatically retransmitted and are not a matter 
+of great concern unless their number becomes excessive.
+
+@LIST EDGE = # of <$IEnquiries>Enquiries:
+
+@LIST ITEM = An enquiry is sent under two circumstances:(1) when a 
+request is made to initiate a transmission, and (2) when data is missed 
+and one end asks for re-transmission. If nothing is missed during 
+an entire transmission then this number will be 1. The number of enquiries 
+should be small.
+
+The large open area below these boxes is the dialogue area in which 
+commands can be typed or displayed and various other messages will 
+appear. The <169>?<170> is used as the prompt<$Iprompt>. This prompt 
+is similar to the DOS prompt in that commands are typed in with parameters 
+and then the Enter key is pressed to cause the command to be processed. 
+The interface differs from DOS in several detailed ways which are 
+explained later.
+
+

@@ -1,0 +1,81 @@
+4.0 Interactive Command Line Interface
+
+D3-3780 has an interactive command line interface and a batch interpreter
+for running unattended.  These two are very similar in that most of the
+commands can be used in either one.  
+
+4.1 Interactive Editing keys
+
+When you are at the D3-3780 prompt there are several editing keys at your
+disposal.  Some of these are similar to DOS' keys but differences exist.
+Here is a list of each key and its function:
+
+        F1 : This key has the same function as it does in DOS.  It will copy
+             the previous command a character at a time.
+
+        F3 : This key has the same function as it does in DOS.  It will copy 
+             the portion of the previous command which is to the right of the 
+             cursor to the current line.
+
+        F5 : Abort command but store command so that F1 and F3 will bring it
+             back up.
+
+        F10: Delete the entire command.
+
+  Backspace: Moves cursor back (left) one position and deletes the character 
+             to the left of the original cursor.  This is identical to DOS.
+
+ Left Arrow: Moves the cursor back (left) one position but does not delete 
+             the prior character.  In DOS, this key operates the same as the
+             backspace key.
+
+Right Arrow: Moves the cursor right one position unless you are already at
+             the end of the command.
+
+       Home: Bring the cursor to the beginning of the command.
+
+        End: Bring the cursor to the end of the command.
+
+     Insert: Toggles Insert/Overwrite mode.  Normally, if a letter is typed 
+             while the cursor is over a character in the command the new
+             letter will be inserted.  This is insert mode.  If D3-3780 is
+             in overwrite mode the old character is replaced with the new
+             one.  The cursor will appear as a large flashing block in
+             overwrite mode.
+
+     Delete: Delete the character over the cursor.
+
+        Esc: A general abort from any type of failed operation.  Will abort
+             a command in the middle of it but will not store the command
+             like the F5 key.  In this respect the key resembles DOS' use
+             of it.
+
+The individual commands that are specific to interactive mode will be
+explained in the command summary.
+
+4.2 Delimiters
+
+Certain characters are used to separate parameters in the commands.  These
+characters are generally used in the same ways.  They are not always
+interchangeable.  These characters are:
+
+   " " (a space):   Normal delimiter used to separate command and first 
+                    parameter.
+
+   "," (a comma):   Interchangeable with a space as far as D3-3780 is 
+                    concerned.
+
+   ";" (semicolon): Used for optional parameters that modify mandatory
+                    parameters.  The semicolon is used in commands that
+                    take a set of parameters to set options that affect
+                    the parameter before it.  See the "s" and "rite"
+                    commands.
+
+   "+" (plus sign): Used for commands that have a variable number of
+                    parameters.  Most commands will actually take a blank
+                    or comma also but the plus accurately describes the
+                    behavior.
+
+   "=" (equal sign):Indicates either equality or assignment depending on 
+                    the command.  Used only in batch commands.
+

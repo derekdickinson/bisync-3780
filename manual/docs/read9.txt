@@ -1,0 +1,82 @@
+
+9.0 The D3-3780.CFG file and its options
+
+D3-3780 will automatically look for a configuration file.  This file is 
+named "D3-3780.CFG" (see the next section for details on how to change 
+this name) and is a setup command file.  D3-3780 will look for the 
+configuration file first in the current directory and then in the directory
+which contains "D3-3780.EXE" (this name can be changed in the next section
+also).  If the file doesn't exist then a default setup is used.
+
+The filename can be overridden by putting the filename on the
+command line.
+
+Examples:
+
+	C>D3-3780 file.cfg
+	C>D3-3780 -Ffile.cmd file.cfg
+
+The configuration file is fundamentally another command file.  However,
+there are a couple of significant differences:  
+
+  The most significant difference is that the modem has not been 
+  initialized in any way when the file is run.  However, the "MSETH" 
+  command can be used to initialize the modem in the configuration file.
+
+  All video writes are automatically suppressed.  The "unsup" and "undsp"
+  commands can be used to turn on video writes.  If you intend to use
+  direct video writes within the command file then the "undsp" function
+  must be performed.
+
+  The branching is done using the slow "searching" technique rather than
+  the faster table based technique (see section 5.1 on the "MB" variable).
+  The branching technique cannot be changed within the file.
+
+  Assigning values to the "CF" (command file name) and DP (Dash Parameter)
+  status variables will have the desired effect.  These variables should 
+  only be read in a normal command file but can be use instead of the 
+  "-F" and "file.cmd" command line options if used in the configuration 
+  file.  This allows D3-3780 to run any file without (DOS) command line 
+  parameters.
+
+
+Typically, this file will be used to save and restore the startup screen and
+cursor location and to load the direct video screen and the format strings
+for the status variables.  The configuration file itself can contain the
+direct video screen and format strings.  See the descriptions of the "LSCRN"
+and "LSTVS" options to see how this is done.
+
+
+9.1 Setting the Package and Configuration filenames.
+
+There is a utility program available to people with an extreme need to
+customize D3-3780 named PACKINST.EXE.  This program allows you to 
+change the name of the executable and configuration file by modifying the
+executable program itself.  Run PACKINST.EXE from DOS with no parameters
+and it will ask for three strings:
+
+  The package name is the first parameter it will ask for.  This value is
+  used in place of the "D3-3780" string in all prompts throughout the
+  package.  If the package name were "packname" then the executable file
+  should be "packname.exe", the help file "packname.hlp" and the default
+  command file "packname.cmd" (used if -F is not followed by a filename).
+  The package name is case sensitive since it is displayed in several
+  places in the program.
+
+  The startup (or configuration) filename is the second parameter which
+  is asked for.  This name is normally, "D3-3780.CFG".  Any name can be
+  used instead.
+
+  The third value is the name of the executable in which to install the
+  first two values.  If you have renamed the package from "D3-3780.EXE"
+  then the new name should be entered here.  Otherwise press enter.
+
+The installation modifies the executable file itself but does not affect
+the time stamp of the executable file.  The time and date values can still
+be trusted.
+
+System Initilization Commands
+----------------------------------------------------------------------------
+lscrn  lstvs   mseth   sdefs   setpr   sform   smask   smax    so      sptyp
+tabls  vtype
+

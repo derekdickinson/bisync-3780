@@ -1,0 +1,6 @@
+char *bscrn;
+
+char critscrn[]=
+"\2\xA\x14É\x1f\x26Í»\2\xB\x14"
+"º Abort, Retry or Ignore? \x14\5\x16\x14\x1f\xc º\2\xC\x14"
+"È\x1f\x26Í¼";

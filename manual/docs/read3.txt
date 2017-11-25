@@ -1,0 +1,112 @@
+3.0 The Default Command Screen
+
+This version of D3-3780 is strictly command driven.  An alternate (menu-
+driven) interface will be offered in addition.  The command driven interface
+can be used in either interactive or batch mode.  The interactive mode takes
+commands from the keyboard and the batch mode takes commands from a text
+file.  An example of the command driven D3-3780 Screen appears below:
+
+ÉÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ D3-3780 ÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ»
+º 11:58:24  5/10/89   C:\D3-3780\BIN              Copyright D3 Softdesign 1989 º
+ÇÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¶
+º Print File:DATARECV.000              ³ Send File:°±²Û No File Û²±°           º
+º Std:Vary   Tran:Binary Auto-Name:Yes ³ Mode:Std. Vary    Destination:Printer º
+ÇÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¶
+º Punch File:CON                       ³ Bytes Sent/Received:0              Rs º
+º Std:Vary   Tran:Binary Auto-Name:Yes ³ Blocks:0       Naks:0   Enquiries:0   º
+ÈÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¼
+?m
+Establish a connection with the handset and then press Enter
+The modem is now trying to connect (press Esc to abort)
+Connected
+?dir *.obj
+NEWBAT   OBJ    BATCH    OBJ    BATCMDS  OBJ    KEYSTUF  OBJ    CMDS     OBJ
+ED       OBJ    HELP     OBJ    INTRUPTS OBJ    DUMMY    OBJ    SCRNLIB  OBJ
+SYNC     OBJ    VIDEO    OBJ    BUFRCV   OBJ    GETDTA   OBJ    BUFSEND  OBJ
+MDMSTART OBJ    STUBS    OBJ    CONNECT  OBJ    DIE      OBJ    GENCMDS  OBJ
+LISEND   OBJ    PARSER   OBJ    RCV      OBJ    SEND     OBJ    MAIN     OBJ
+?
+
+
+
+
+                                    Online                                  
+------------------------------------------------------------------------------
+
+The boxes at the top of the screen contain status and configuration 
+information the area below it is a window which scrolls as commands are
+entered and information displayed (like the example directory).  The last
+line is for additional status information (with "Online" written on it).
+
+Starting at the top of the screen I'll explain the different parts.  The 
+top box contains the time, date, current directory and a copyright message.
+
+Actual 3780 workstations have a printer and, optionally, a punch.  A host or
+other 3780 device can specify which destination a transmission will be sent 
+to.  D3-3780 maintains separate configuration information for each of these 
+psuedo-devices.  
+
+The two boxes to the lower left (with "Punch File" and "Print File" in the 
+corners) display configuration information on the psuedo-printer and psuedo-
+punch.  The designations "Print File" and "Punch File" mean the filename to
+which the printer or punch data will be sent.  The word "CON" can be used in
+this place to have incoming data sent to the screen.  
+
+Below the file designations are the "Std", "Tran" and "Auto-Name" 
+indicators.  These are the buffer formatting and auto-naming options.
+The possible values for the buffer format options are: "Vary", "Fixed",
+"Binary" and "Hex".  These values are described in section 2.2 above.
+The Auto-Name option determines if separate files will be concatenated
+or whether a new extension will be created for each reception.  If yes
+an extension of "000" will replace a non-numeric extension and after that
+the extension will increment with each new file that is received.  Otherwise,
+additional files will be appended to the earlier files.
+
+The box to the right of the printer box (with "Send File" in it) contains
+status information for the file being sent.  The send file itself displays
+the name of the file being transferred or "CON" if a message is being sent
+from the command prompt.  The "Mode" indicates whether the transmission is
+standard or transparent ("Std" or "Tran") and what buffer translation 
+technique is being used ("Vary", "Fixed", "Binary" or "Hex").  To the right
+of this is the indicator of whether the file is being sent to the remote's
+printer or punch.
+
+Below the sending box is a status box with some values in it.  These values
+are sending status when sending and receiving status when receiving.  The 
+"Rs" in the upper right hand corner of this box indicates that the data is
+for "R"eceiving in "s"tandard mode.  There will always be either an R or S 
+(receive or send) as the first character and an "s" or "t" (standard or 
+transparent) for the second character.  Additional information can be
+obtained using the "ST"atistics command.
+
+  Bytes Sent/Received: This is the number of bytes sent or received in the 
+    last or current reception or transmission (the number is updated during 
+    the reception).  This number is not be very meaningful if the receive 
+    filename is "CON".  In this case, the remote will send each message as 
+    if it were a complete file.
+
+  # of Blocks : This is the number of blocks (chunks of data) received
+     or transmitted to the receive or transmit filenames.  These
+     numbers are updated dynamically.  The number will increment
+     when the block is stored to disk in the receive case or when
+     the block is taken from the disk in the send case.
+
+  # of Naks : This is the number of Naks (No acknowledgments) sent
+     or received.  A Nak is a message sent by the receiving computer 
+     when an error is detected in a transmitted block.  The number of 
+     Naks will normally be quite small unless the telephone line 
+     quality is poor.
+
+  # of Enquiries : An enquiry is sent under two circumstances:(1)
+     when a request is made to initiate a transmission, and (2)
+     when data is missed and one end asks for re-transmission.  If
+     nothing is missed during an entire transmission then this
+     number will be 1.  The number of enquiries should be small.
+
+The large open are below this boxes is the dialogue area in which commands can
+be typed or displayed and various other messages will appear.  The "?" is 
+used as the prompt.  This prompt is similar to the DOS prompt in that 
+commands are typed in with parameters and then the Enter key is pressed to
+cause the command to be processed.  The interface differs from DOS in several
+detailed ways.
+

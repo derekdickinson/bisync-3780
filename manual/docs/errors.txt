@@ -1,0 +1,568 @@
+ABDISC     "The remote computer dropped the line"
+ALEXISTS   "\"%s\" already exists or invalid path"
+ARGOVER    "Argument List too big"
+BADAMP     "\"&\" not allowed on data type in \"%s\""
+BADBRAK    "Brackets not allowed in \"%s\""
+BADCARAT   "\"^\" on non-string\"%s\""
+BADCMD     "Did not understand syntax (Press \"?<Enter>\" for help)"
+BADEND     "Bad final character in \"%s\""
+BADFILE    "Unable to open file [%s]"
+BADFILE2   "Unable to open file \"%s\" in \"%s\" mode"
+BADIND     "Bad index in \"%s\", index must be a scalar"
+BADLBL     "Label [%s] not found"
+BADLINE    "Line number %d,[%s] exceeds command file length"
+BADMATCH   "Wildcards on left must be in same positions as those on right"
+BADNUM     "Error in phone number"
+BADOPR     "Operator '%d' not recognized"
+BADOPRP    "Operator '%d' not valid with pointers or not recognized"
+BADSTATE   "Unexpected state [%d]"
+BADTYP     "Unknown Variable or Symbol and parameter not allowed together in \"%s\""
+BADVAR     "Unknown Variable [%s]"
+BUSYSIG    "Received busy signal"
+CANTDEL    "Unable to delete file [%s]\r\n"
+CANTINT    "This command is only allowed in batch mode"
+CANTOFF    "This command cannot be performed unless online"
+CANTON     "This command cannot be performed while online"
+CANTPROG   "No process in progress to kill."
+CMDFILRERR "Command file read error"
+CURSEND    "This command cannot be performed until current send is done"
+DBADDR     ""
+DISKRCV    "Disk error, See if disk is full"
+DSROUT     "The modem was unable to train"
+ERRHIGH    "The value [%d] of parameter %d is too big, maximum allowed is %d"
+ERRLOW     "The value [%d] of parameter %d is too small, minimum allowed is %d"
+FNAMESIZE  "Filename (and path) is too big in [%s]"
+IDLELMT    "Idle timeout during receive."
+INDBIG     "Number in \"%s\" must be between 0-9"
+LEASTPRM   "At least %d parameter(s) required for this command"
+LOOPOUT    "Loopcount expired\r\n"
+MDMERR     "Error interfacing modem [%d]"
+MUSTASN    "The parameter [%s] cannot be assigned to"
+MUSTBUF    "Parameter [%s] should be a pointer variable or db"
+MUSTDEST   "The destination parameter [%s] cannot be a filename"
+MUSTDEST2  "The destination parameter [%s] must be label or line number"
+MUSTFIL    "Parameter [%s] must be a filename"
+MUSTINTASN "The value in parameter %d,[%s] cannot be assigned an integer"
+MUSTLEN    "Length Parameter [%s] cannot be a file or label"
+MUSTOPR    "Parameter [%s] should be a pointer or scalar variable"
+MUSTPASN   "Parameter [%s] should be a pointer variable"
+MUSTPOINT  "Parameter [%s] should be a string constant or pointer"
+MUSTPRM    "This command requires %d parameter(s)"
+MUSTSCAL   "Parameter [%s] should be a scalar"
+MUSTSCASN  "The parameter [%s] cannot be assigned a scalar"
+MUSTSPEC   "Parameter [%s] should be a filename of file specification"
+MUSTVAL    "Parameter [%s] should be a pointer or scalar"
+NOACTIM    "No activity timeout exceeded"
+NOCOLON    "The time designation should contain a colon"
+NOCTS      "The modem is not able to transmit, It will not raise CTS"
+NOTXBUF    "The modem is not able to transmit, SCC TX buffer error"
+NOHELP     "Unable to open help file \"%s.hlp\""
+NOINTMEM   "Insufficient internal memory to process command"
+NOLABEL    "Label not allowed in parameter [%s]"
+NOMEM      "Insufficient memory to process command"
+NORET      "Could not return to file \"%s\"."
+NOSPECS    "The filename cannot include wildcards"
+NONEFOUND  "No files found (using [%s])"
+NOTFOUND   "File [%s] not found"
+NOTHDEV    "Attempt to move a file to another device"
+NOTONE     "No tone detected"
+NOTOPEN    "The file specified by handle [%d] is not open"
+NOMATCH    "Pointer and scalar operands cannot both be present in this command"
+OPMUST     "Optional parameter must be [%c] or nonexistant"
+OVERLEN    "The length array value is larger than the db buffer"
+RETOVER    "Return without a call"
+RNAKERR    "No acknowledgement limit exceeded.  Receive aborted"
+RREMABRT   "Remote aborted receive"
+SBADACKLMT "Bad acknowledgement limit exceeded.  Send aborted"
+SENQLMT    "Incomplete file sent - Enquiry limit was exceeded"
+SNAKERR    "No acknowledgement limit exceeded.  Send aborted"
+SREMABRT   "Remote computer aborted send"
+STRFIL     "Parameter [%s] must be a string of filename"
+STRSPEC    "The parameter [%s] should be a string or file specification"
+TOOBIG     "File is too large for an integer to store its length"
+TIMEDOUT   "Timeout expired"
+USRABRT    "User Abort"
+
+
+-----------------------------------------------------------------------------
+Connection Errors
+  The connection could not be successfully established
+
+Communication Errors
+  The communication could not be successfully completed
+
+State Errors
+  The command is not valid in the current state
+
+Parameter Errors
+  The value of the parameter is out of range or does not have a match
+
+Typing errors
+  The parameter is not of the correct type
+
+Disk Errors
+  The disk could not be accessed
+
+Syntax Errors
+  Too few parameters
+-----------------------------------------------------------------------------
+
+Recoverable Errors
+
+Fundamental Errors
+
+Errors in interactively oriented commands
+
+-----------------------------------------------------------------------------
+
+?[,D3-3780 command or page number]
+  NOHELP, NOTFOUND handled by an special help
+
+>[DOS command]
+/[DOS command]
+  NOMEM, ARGOVER
+
+*[Any thing you want out here up to 200 characters]
+  No possible errors
+
+aa[,+timeout] or [,hh:mm]
+  CANTON
+  USRABRT
+    TIMEDOUT NOCOLON               (pause function)
+    MUSTSCAL HIGHERR LOWERR        (getscal function)
+
+app ptr,file[,val]
+  DISKERR
+  LEASTPRM 2
+  1 MUSTVAL
+  2 MUSTFIL
+  3 MUSTLEN
+
+astat     
+  DISKERR
+
+bdn buf[,val][;op]  
+  LEASTPRM 1
+  1 MUSTBUF 1 pram
+  2 MUSTLEN 2 pram
+  3 OPMUST "L"
+
+bdp buf[,val][;op]     
+  LEASTPRM 1
+  1 MUSTBUF 1 pram
+  2 MUSTLEN 2 pram
+  3 OPMUST "L"
+
+buf buf[,val][;op]     
+  LEASTPRM 1
+  1 MUSTBUF 1 pram
+  2 MUSTLEN 2 pram
+  3 OPMUST "L"     
+
+c
+  CANTON
+
+call dest|file
+  BADFILE
+  MUSTPRM 1
+  NOINTMEM
+  CANTINT, BADLBL pram, BADLINE pram  ; These handled by dogo
+
+cat destptr,sourceptr
+  MUSTPRM 2
+  1 MUSTBUF 1 pram
+  2 MUSTPOINT 2 pram
+
+clall
+  DISKERR
+
+close handle
+  DISKERR
+  MUSTPRM 1
+  1 HIGHERR, LOWERR (getscal)
+
+cls
+
+cpy destptr,sourceptr[,val]
+  LEASTPRM 2
+  1 MUSTBUF 1 pram
+  2 MUSTPOINT 2 pram
+  3 MUSTLEN 3 pram
+
+da
+
+dec val
+  MUSTPRM 1
+  MUSTOPR
+
+del spec
+  DISKERR
+  MUSTPRM 1
+  MUSTSPEC
+
+dir[ spec]
+  DISKERR
+  MUSTSPEC
+
+dl string or file
+  BADFILE
+  CANTON
+  MUSTPRM 1
+  STRFIL
+  BUSYSIG
+  NOTONE
+  BADNUM
+
+dn,file[,ops]
+  DISKERR
+  LEASTPRM 1
+  1 MUSTFIL
+  2 MUSTOPS0
+
+dp,file[,ops]
+  DISKERR
+  LEASTPRM 1
+  1 MUSTFIL
+  2 MUSTOPS0
+
+ds     
+  CANTOFF
+  NOCTS
+
+dt,file
+  DISKERR
+  MUSTPRM 1
+  MUSTFIL
+
+enz     
+
+end
+
+er spec
+  DISKERR
+  MUSTPRM 1
+  MUSTSPEC
+
+ex[,errorlevel]
+  MUSTSCAL
+
+fq
+
+frite han,val[;ops][+val[;ops]]...
+  DISKERR
+  LEASTPRM 2
+  1 HIGHERR, LOWERR (getscal)
+  val RITEVAL
+  ops MUSTOPS1
+
+fstat handle
+  DISKERR
+  MUSTPRM 1
+  HIGHERR, LOWERR (getscal)
+
+gbuf handle,buf[,val]
+  DISKERR
+  LEASTPRM 2
+  1 HIGHERR, LOWERR (getscal)
+  2 MUSTBUF
+  2 MUSTLEN
+
+go dest
+  DISKERR
+  MUSTPRM 1
+  CANTINT, BADLINE, BADLABEL
+
+if errdest,noterrdest
+  CANTINT, BADLINE, BADLABEL
+
+ife spec,existdest,notexistdest
+  DISKERR
+  LEASTPRM 1
+  CANTINT, BADLINE, BADLABEL
+
+ifef handle,eofdest,noteofdest
+  DISKERR
+  LEASTPRM 1
+  HIGHERR, LOWERR (getscal)
+  CANTINT, BADLINE, BADLABEL
+
+ifi lval=rval,equdest,diffdest
+  LEASTPRM 3
+  NOMATCH
+  CANTINT, BADLINE, BADLABEL
+
+ifp errdest,prindest,punchdest
+  CANTINT, BADLINE, BADLABEL
+
+ifs lstr=rstr,equadest,diffdest
+  LEASTPRM 2
+  1 MUSTPOINT
+  2 MUSTPOINT
+  CANTINT, BADLINE, BADLABEL
+
+ifo onlinedest,offlinedest
+  CANTINT, BADLINE, BADLABEL
+
+ift rfile=lfile,equadest,lfilegreaterdest,rfilegreaterdest
+  LEASTPRM 2
+  1 MUSTFIL
+  2 MUSTFIL
+  CANTINT, BADLINE, BADLABEL
+
+il loopcount
+  MUSTPRM 1
+  MUSTSCAL
+
+inc val
+  MUSTPRM 1
+  MUSTOPR
+
+intrp str
+  MUSTPRM 1
+  MUSTPOINT
+
+key num[;op],val[;ops][+val[;ops]]...
+  LEASTPRM 2
+  1 SCALASN
+  op OPMUST "C"
+  val RITEVAL
+  ops MUSTOPS1
+
+kl
+  CANTPROG
+
+ld spec
+  DISKERR
+  MUSTPRM 1
+  MUSTSPEC
+
+lf file
+  DISKERR
+  MUSTPRM 1
+  MUSTFIL
+
+load ptr,file[,val]
+  DISKERR
+  LEASTPRM 2
+  1 MUSTASN
+  2 MUSTFIL
+  3 MUSTLEN
+
+lwr val
+  MUSTPRM 1
+  MUSTASN
+
+m
+  CANTON
+
+mo
+  CANTON
+
+mome str[;op]
+  CANTON
+  DISKERR
+  LEASTPRM 1
+  1 MUSTPOINT
+  2 OPMUST "N"
+
+mov destval,sourceval
+  MUSTPRM 2
+  1 MUSTOPR
+  2 MUSTSCAL
+
+mv 
+  CANTON
+
+on num,lownum[;highnum][=dest],lownum[;highnum][=dest],...
+  LEASTPRM 2
+  1 MUSTSCAL
+  lownum MUSTSCAL
+  highnum MUSTSCAL
+  dest MUSTDEST
+
+open handle,file[;ops]
+  DISKERR
+  BADFILE
+  LEASTPRM 2
+  1 HIGHERR, LOWERR (getscal)
+  2 MUSTFIL
+  3 MUSTOPS0
+
+opr destval,sourcenum,opchar
+  MUSTPRM 3
+  1 MUSTOPR
+  2 MUSTSCAL
+  3 MUSTSCAL
+
+p[,+timeout] or [,hh:mm]
+  LEASTPRM 1
+  MUSTSCAL 1 pram
+  RANGERR 0 23 or 00 59
+  NOCOLON
+
+pbuf handle,buf[,val]
+  DISKERR
+  LEASTPRM 2
+  1 HIGHERR, LOWERR (getscal)
+  2 MUSTBUF
+  3 MUSTLEN
+
+q[,errorlevel]
+  MUSTSCAL
+
+qnz
+
+rdln handle,ptr[,val]
+  DISKERR
+  LEASTPRM 2
+  1 HIGHERR, LOWERR (getscal)
+  2 MUSTBUF
+  3 MUSTLEN
+
+read han,val[;ops][+val[;ops]]...
+  DISKERR
+  LEASTPRM 2
+  1 HIGHERR, LOWERR (getscal)
+  val RITEVAL
+  ops MUSTOPS1
+
+rem commandstr[+commandstr]...
+  LEASTPRM 1
+  MUSTPOINT
+
+ren oldspec newspec
+  DISKERR
+  ALEXISTS
+  BADMATCH
+  NOTFOUND
+  NOTHDEV
+  NONEFOUND
+  MUSTPRM 2
+  1 MUSTSPEC
+  2 MUSTSPEC
+
+ret
+  NOCALLYET
+
+rite val[;ops][+val[;ops]]...
+  LEASTPRM 1
+  val RITEVAL
+  ops MUSTOPS1
+
+s dat[;ops][+dat[;ops]]... ops
+  BADFILE
+  CANTOFF
+  LEASTPRM 1
+  dat STRSPEC
+  ops MUSTOPS0
+  ENQOVR
+  SREMABRT
+
+save ptr,file[,val]
+  DISKERR
+  LEASTPRM 2
+  1 MUSTVAL
+  2 MUSTFIL
+  3 MUSTLEN
+
+seek handle,wherenum[,refnum]
+  DISKERR
+  LEASTPRM 2
+  1 HIGHERR, LOWERR (getscal)
+  2 MUSTSCAL, RANGE? (Cannot seek before beginning or past end of file)
+  3 MUSTSCAL, RANGE? (must be 0, 1 or 2)
+
+setbf buf[,val,[,num]]
+  LEASTPRM 1
+  1 MUSTBUF
+  2 MUSTLEN
+  3 MUSTSCAL
+
+size numlow[;numhigh],file
+  BADFILE
+  LEASTPRM 2
+  1 MUSTINTASN
+  numhigh MUSTINTASN
+  file MUSTFIL
+  TOOBIG
+
+slen num,str
+  MUSTPRM 2
+  1 SCALASN
+  2 MUSTPOINT (Allow filenames and labels also?)
+
+so file|ptr
+  CANTON
+  BADFILE
+  MUSTPRM 1
+  STRFIL
+
+sptr num,ptrbigger,ptrsmaller
+  MUSTPRM 3
+  1 SCALASN
+  2 MUSTPOINT
+  3 MUSTPOINT
+
+srite str,val[;ops][+val[;ops]]...
+  LEASTPRM 2
+  1 MUSTBUF
+  2 RITEVAL
+  3 MUSTOPS1
+
+ss
+  CANTOFF
+  CURSEND
+
+st
+
+stc deststr,sourcestr,char
+  MUSTPRM 3
+  1 MUSTPASN
+  2 MUSTPOINT
+  3 MUSTSCAL
+
+stst deststr,sourcestr,substr
+  MUSTPRM 3
+  1 MUSTPASN
+  2 MUSTPOINT
+  3 MUSTPOINT
+
+sup
+
+svals
+  CANTOFF
+  CURSEND
+
+td
+
+tell handle,varnum
+  DISKERR, NOTOPEN?
+  MUSTPRM 2
+  1 HIGHERR, LOWERR (getscal)
+  2 SCALASN
+
+tk
+  ?
+
+tr
+
+unsup
+
+upr val
+  MUSTPRM 1
+  SCALASN
+
+vals
+
+w,timeout
+  MUSTPRM 1
+  MUSTSCAL
+  TIMEOUT
+  RREMABRT
+----------------------------------------------------------------------------
+
+xb file
+  BADFILE
+  MUSTPRM 1
+  MUSTFIL
+
